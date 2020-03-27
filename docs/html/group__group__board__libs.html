@@ -98,42 +98,31 @@ $(document).ready(function(){initNavTree('group__group__board__libs.html','');})
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:gabb0b30d1e6a6c7e301b2b74450be762d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gabb0b30d1e6a6c7e301b2b74450be762d">CY_RETARGET_IO_BAUDRATE</a>&#160;&#160;&#160;(115200)</td></tr>
+<tr class="memitem:gabb0b30d1e6a6c7e301b2b74450be762d"><td class="memItemLeft" align="right" valign="top"><a id="gabb0b30d1e6a6c7e301b2b74450be762d"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gabb0b30d1e6a6c7e301b2b74450be762d">CY_RETARGET_IO_BAUDRATE</a>&#160;&#160;&#160;(115200)</td></tr>
+<tr class="memdesc:gabb0b30d1e6a6c7e301b2b74450be762d"><td class="mdescLeft">&#160;</td><td class="mdescRight">UART baud rate. <br /></td></tr>
 <tr class="separator:gabb0b30d1e6a6c7e301b2b74450be762d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8412e89ceaeefb3ab3d75509ab99680b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga8412e89ceaeefb3ab3d75509ab99680b">CY_RETARGET_IO_CONVERT_LF_TO_CRLF</a></td></tr>
+<tr class="memdesc:ga8412e89ceaeefb3ab3d75509ab99680b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defining this macro enables conversion of line feed (LF) into carriage return followed by line feed (CR &amp; LF) on the output direction (STDOUT).  <a href="#ga8412e89ceaeefb3ab3d75509ab99680b">More...</a><br /></td></tr>
 <tr class="separator:ga8412e89ceaeefb3ab3d75509ab99680b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ga21265301bf6e9239845227c2aead9293"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga21265301bf6e9239845227c2aead9293">cy_retarget_io_init</a> (cyhal_gpio_t tx, cyhal_gpio_t rx, uint32_t baudrate)</td></tr>
-<tr class="memdesc:ga21265301bf6e9239845227c2aead9293"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization function for redirecting low level IO commands to allow sending messages over a UART interface. This will setup the communication interface to allow using printf and related functions.  <a href="#ga21265301bf6e9239845227c2aead9293">More...</a><br /></td></tr>
+<tr class="memdesc:ga21265301bf6e9239845227c2aead9293"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization function for redirecting low level IO commands to allow sending messages over a UART interface.  <a href="#ga21265301bf6e9239845227c2aead9293">More...</a><br /></td></tr>
 <tr class="separator:ga21265301bf6e9239845227c2aead9293"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa3ec2f7eab2ff27d716f2b22d90ff514"><td class="memItemLeft" align="right" valign="top"><a id="gaa3ec2f7eab2ff27d716f2b22d90ff514"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gaa3ec2f7eab2ff27d716f2b22d90ff514">cy_retarget_io_deinit</a> (void)</td></tr>
-<tr class="memdesc:gaa3ec2f7eab2ff27d716f2b22d90ff514"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the UART interface allowing it to be used for other purposes. After calling this, printf and related functions will no longer work. <br /></td></tr>
+<tr class="memitem:gaa3ec2f7eab2ff27d716f2b22d90ff514"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gaa3ec2f7eab2ff27d716f2b22d90ff514">cy_retarget_io_deinit</a> (void)</td></tr>
+<tr class="memdesc:gaa3ec2f7eab2ff27d716f2b22d90ff514"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the UART interface allowing it to be used for other purposes.  <a href="#gaa3ec2f7eab2ff27d716f2b22d90ff514">More...</a><br /></td></tr>
 <tr class="separator:gaa3ec2f7eab2ff27d716f2b22d90ff514"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:gacde12f44b3729c38a0aa85f7679054c9"><td class="memItemLeft" align="right" valign="top">cyhal_uart_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gacde12f44b3729c38a0aa85f7679054c9">cy_retarget_io_uart_obj</a></td></tr>
+<tr class="memitem:gacde12f44b3729c38a0aa85f7679054c9"><td class="memItemLeft" align="right" valign="top"><a id="gacde12f44b3729c38a0aa85f7679054c9"></a>
+cyhal_uart_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gacde12f44b3729c38a0aa85f7679054c9">cy_retarget_io_uart_obj</a></td></tr>
+<tr class="memdesc:gacde12f44b3729c38a0aa85f7679054c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">UART HAL object used by this library. <br /></td></tr>
 <tr class="separator:gacde12f44b3729c38a0aa85f7679054c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="gabb0b30d1e6a6c7e301b2b74450be762d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gabb0b30d1e6a6c7e301b2b74450be762d">&#9670;&nbsp;</a></span>CY_RETARGET_IO_BAUDRATE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CY_RETARGET_IO_BAUDRATE&#160;&#160;&#160;(115200)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>UART baud rate </p>
-
-</div>
-</div>
 <a id="ga8412e89ceaeefb3ab3d75509ab99680b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga8412e89ceaeefb3ab3d75509ab99680b">&#9670;&nbsp;</a></span>CY_RETARGET_IO_CONVERT_LF_TO_CRLF</h2>
 
@@ -145,7 +134,9 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Defining this macro enables conversion of line feed (LF) into carriage return followed by line feed (CR &amp; LF) on the output direction (STDOUT). You can define this macro through the DEFINES variable in the application Makefile. </p>
+
+<p>Defining this macro enables conversion of line feed (LF) into carriage return followed by line feed (CR &amp; LF) on the output direction (STDOUT). </p>
+<p>You can define this macro through the DEFINES variable in the application Makefile. </p>
 
 </div>
 </div>
@@ -182,8 +173,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialization function for redirecting low level IO commands to allow sending messages over a UART interface. This will setup the communication interface to allow using printf and related functions. </p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Initialization function for redirecting low level IO commands to allow sending messages over a UART interface. </p>
+<p>This will setup the communication interface to allow using printf and related functions. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">tx</td><td>UART TX pin </td></tr>
     <tr><td class="paramname">rx</td><td>UART RX pin </td></tr>
@@ -195,19 +186,24 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="gacde12f44b3729c38a0aa85f7679054c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gacde12f44b3729c38a0aa85f7679054c9">&#9670;&nbsp;</a></span>cy_retarget_io_uart_obj</h2>
+<a id="gaa3ec2f7eab2ff27d716f2b22d90ff514"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa3ec2f7eab2ff27d716f2b22d90ff514">&#9670;&nbsp;</a></span>cy_retarget_io_deinit()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">cyhal_uart_t cy_retarget_io_uart_obj</td>
+          <td class="memname">void cy_retarget_io_deinit </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>UART HAL object used by this library </p>
+
+<p>Releases the UART interface allowing it to be used for other purposes. </p>
+<p>After calling this, printf and related functions will no longer work. </p>
 
 </div>
 </div>

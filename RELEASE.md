@@ -1,7 +1,18 @@
-### Release Notes
-Retarget IO version 1.0.0.
+# Retarget IO
 
-This is the first release of this library. See [README.md](README.md) for details on how to use this library.  
+A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using `printf()`.
+
+### What's Included?
+* printf() support over a UART terminal
+* Support for GCC, IAR, and ARM toolchains
+* Thread safe write for NewLib
+
+### What Changed?
+#### v1.1.0
+* Implemented system I/O retarget functions specific to ARM Compiler 6.
+* Made _write implementation thread-safe for Newlib.
+#### v1.0.0
+* Initial release
 
 ### Supported Software and Tools
 This version of the Retarget IO was validated for compatibility with the following Software and Tools:
@@ -15,7 +26,7 @@ This version of the Retarget IO was validated for compatibility with the followi
 
 ### More information
 
-* [API Reference Guide](https://cypresssemiconductorco.github.io/retarget-io/html/modules.html)
+* [API Reference Guide](https://cypresssemiconductorco.github.io/retarget-io/html/index.html)
 * [Cypress Semiconductor](http://www.cypress.com)
 * [Cypress Semiconductor GitHub](https://github.com/cypresssemiconductorco)
 * [ModusToolbox](https://www.cypress.com/products/modustoolbox-software-environment)
@@ -24,4 +35,4 @@ This version of the Retarget IO was validated for compatibility with the followi
 * [PSoC 6 Resources - KBA223067](https://community.cypress.com/docs/DOC-14644)
 
 ---
-© Cypress Semiconductor Corporation, 2019.
+© Cypress Semiconductor Corporation, 2019-2020.

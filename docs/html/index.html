@@ -95,7 +95,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p><b>NOTE:</b> If the application is built using newlib-nano, by default, floating point format strings (f) are not supported. To enable this support, you must add <code>-u _printf_float</code> to the linker command line.</p>
 <h3>Quick Start</h3>
 <ol type="1">
-<li>Add #<code>include cy_retarget_io.h</code></li>
+<li>Add #<code>include "cy_retarget_io.h"</code></li>
 <li><p class="startli">Call <code>cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);</code></p>
 <p class="startli"><code>CYBSP_DEBUG_UART_TX</code> and <code>CYBSP_DEBUG_UART_RX</code> pins are defined in the BSP and <code>CY_RETARGET_IO_BAUDRATE</code> is set to 115200. You can use a different baud rate if you prefer.</p>
 </li>
@@ -105,11 +105,14 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>If you want to use only '\n' instead of "\r\n" for printing a new line using printf(), define the macro <code>CY_RETARGET_IO_CONVERT_LF_TO_CRLF</code> using the <em>DEFINES</em> variable in the application Makefile. The library will then append '\r' before '\n' character on the output direction (STDOUT). No conversion occurs if "\r\n" is already present.</p>
 <h3>More information</h3>
 <ul>
+<li><a href="https://cypresssemiconductorco.github.io/retarget-io/html/index.html">API Reference Guide</a></li>
+<li><a href="http://www.cypress.com">Cypress Semiconductor</a></li>
+<li><a href="https://github.com/cypresssemiconductorco">Cypress Semiconductor GitHub</a></li>
 <li><a href="https://www.cypress.com/products/modustoolbox-software-environment">ModusToolbox</a></li>
 <li><a href="https://github.com/cypresssemiconductorco/Code-Examples-for-ModusToolbox-Software">PSoC 6 Code Examples using ModusToolbox IDE</a></li>
 <li><a href="https://github.com/cypresssemiconductorco/psoc6-middleware">PSoC 6 Middleware</a></li>
 <li><a href="https://community.cypress.com/docs/DOC-14644">PSoC 6 Resources - KBA223067</a> <hr/>
- © Cypress Semiconductor Corporation, 2019. </li>
+ © Cypress Semiconductor Corporation, 2019-2020. </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
