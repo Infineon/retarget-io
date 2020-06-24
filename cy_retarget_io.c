@@ -30,7 +30,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#if defined(CY_RTOS_AWARE) && defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__clang__)
+#if (defined(CY_RTOS_AWARE) || defined(COMPONENT_RTOS_AWARE)) && defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__clang__)
 
 // The cyhal_uart driver is not necessarily thread-safe. To avoid concurrent
 // access, the ARM and IAR libraries use mutexes to control access to stdio
@@ -261,7 +261,7 @@ static void cy_retarget_io_putchar(char c)
     /* Open a file: dummy implementation.
        Everything goes to the same output, no need to translate the file names
        (__stdin_name/__stdout_name/__stderr_name) to descriptor numbers */
-    FILEHANDLE _sys_open (const char *name, int openmode)
+    FILEHANDLE __attribute__((weak)) _sys_open (const char *name, int openmode)
     {
         (void)name;
         (void)openmode;
@@ -269,7 +269,7 @@ static void cy_retarget_io_putchar(char c)
     }
 
     /* Close a file: dummy implementation. */
-    int _sys_close(FILEHANDLE fh)
+    int __attribute__((weak)) _sys_close(FILEHANDLE fh)
     {
         (void)fh;
         return 0;
@@ -277,7 +277,7 @@ static void cy_retarget_io_putchar(char c)
 
     /* Write to a file: dummy implementation.
        The low-level function fputc retargets output to use UART TX */
-    int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
+    int __attribute__((weak)) _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
     {
         (void)fh;
         (void)buf;
@@ -288,7 +288,7 @@ static void cy_retarget_io_putchar(char c)
 
     /* Read from a file: dummy implementation.
        The low-level function fputc retargets input to use UART RX */
-    int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
+    int __attribute__((weak)) _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
     {
         (void)fh;
         (void)buf;
@@ -298,20 +298,20 @@ static void cy_retarget_io_putchar(char c)
     }
 
     /* Write a character to the output channel: dummy implementation. */
-    void _ttywrch(int ch)
+    void __attribute__((weak)) _ttywrch(int ch)
     {
         (void)ch;
     }
 
     /* Check if the file is connected to a terminal: dummy implementation */
-    int _sys_istty(FILEHANDLE fh)
+    int __attribute__((weak)) _sys_istty(FILEHANDLE fh)
     {
         (void)fh;
         return 0;
     }
 
     /* Move the file position to a given offset: dummy implementation */
-    int _sys_seek(FILEHANDLE fh, long pos)
+    int __attribute__((weak)) _sys_seek(FILEHANDLE fh, long pos)
     {
         (void)fh;
         (void)pos;
@@ -319,21 +319,21 @@ static void cy_retarget_io_putchar(char c)
     }
 
     /* Return the current length of a file: dummy implementation */
-    long _sys_flen(FILEHANDLE fh)
+    long __attribute__((weak)) _sys_flen(FILEHANDLE fh)
     {
         (void)fh;
         return 0;
     }
 
     /* Terminate the program: dummy implementation */
-    void _sys_exit(int returncode)
+    void __attribute__((weak)) _sys_exit(int returncode)
     {
         (void)returncode;
         for(;;);
     }
 
     /* Return a pointer to the command line: dummy implementation */
-    char *_sys_command_string(char *cmd, int len)
+    char __attribute__((weak)) *_sys_command_string(char *cmd, int len)
     {
         (void)cmd;
         (void)len;

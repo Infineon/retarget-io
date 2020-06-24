@@ -29,7 +29,7 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="cypress_logo.png"/></a></td>
+  <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="logo.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Retarget IO (retarget-io)</div>
   </td>
@@ -92,7 +92,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="contents">
 <div class="textblock"><h3>Overview</h3>
 <p>A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using <code>printf()</code>. You can specify the TX pin, RX pin, and the baud rate through the <code><a class="el" href="group__group__board__libs.html#ga21265301bf6e9239845227c2aead9293" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init()</a></code> function. The UART HAL object is externally accessible so that you can use it with other UART HAL functions.</p>
-<p><b>NOTE:</b> If the application is built using newlib-nano, by default, floating point format strings (f) are not supported. To enable this support, you must add <code>-u _printf_float</code> to the linker command line.</p>
+<p><b>NOTE:</b> The standard library is not standard in how it treats an I/O stream. Some implement a data buffer by default. The buffer is not flushed until it is full. In that case it may appear that your I/O is not working. You should be aware of how the library buffers data, and you should identify a buffering strategy and buffer size for a specified stream. If you supply a buffer, it must exist until the stream is closed. The following line of code disables the buffer for the standard library that accompanies the GCC compiler: </p><pre class="fragment">setvbuf( stdin, NULL, _IONBF, 0 );
+</pre><p><b>NOTE:</b> If the application is built using newlib-nano, by default, floating point format strings (f) are not supported. To enable this support, you must add <code>-u _printf_float</code> to the linker command line.</p>
 <h3>Quick Start</h3>
 <ol type="1">
 <li>Add #<code>include "cy_retarget_io.h"</code></li>
@@ -106,7 +107,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <h3>More information</h3>
 <ul>
 <li><a href="https://cypresssemiconductorco.github.io/retarget-io/html/index.html">API Reference Guide</a></li>
-<li><a href="http://www.cypress.com">Cypress Semiconductor</a></li>
+<li><a href="http://www.cypress.com">Cypress Semiconductor, an Infineon Technologies Company</a></li>
 <li><a href="https://github.com/cypresssemiconductorco">Cypress Semiconductor GitHub</a></li>
 <li><a href="https://www.cypress.com/products/modustoolbox-software-environment">ModusToolbox</a></li>
 <li><a href="https://github.com/cypresssemiconductorco/Code-Examples-for-ModusToolbox-Software">PSoC 6 Code Examples using ModusToolbox IDE</a></li>

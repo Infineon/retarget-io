@@ -4,6 +4,10 @@
 
 A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using `printf()`. You can specify the TX pin, RX pin, and the baud rate through the `cy_retarget_io_init()` function. The UART HAL object is externally accessible so that you can use it with other UART HAL functions.
 
+**NOTE:** The standard library is not standard in how it treats an I/O stream. Some implement a data buffer by default. The buffer is not flushed until it is full. In that case it may appear that your I/O is not working. You should be aware of how the library buffers data, and you should identify a buffering strategy and buffer size for a specified stream. If you supply a buffer, it must exist until the stream is closed. The following line of code disables the buffer for the standard library that accompanies the GCC compiler:
+
+    setvbuf( stdin, NULL, _IONBF, 0 );
+
 **NOTE:** If the application is built using newlib-nano, by default, floating point format strings (%f) are not supported. To enable this support, you must add `-u _printf_float` to the linker command line.
 
 ### Quick Start
@@ -20,7 +24,7 @@ If you want to use only '\\n' instead of "\r\n" for printing a new line using pr
 ### More information
 
 * [API Reference Guide](https://cypresssemiconductorco.github.io/retarget-io/html/index.html)
-* [Cypress Semiconductor](http://www.cypress.com)
+* [Cypress Semiconductor, an Infineon Technologies Company](http://www.cypress.com)
 * [Cypress Semiconductor GitHub](https://github.com/cypresssemiconductorco)
 * [ModusToolbox](https://www.cypress.com/products/modustoolbox-software-environment)
 * [PSoC 6 Code Examples using ModusToolbox IDE](https://github.com/cypresssemiconductorco/Code-Examples-for-ModusToolbox-Software)
