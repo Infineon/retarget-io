@@ -28,7 +28,7 @@ This version of the Retarget IO was validated for compatibility with the followi
 
 ### More information
 
-* [API Reference Guide](https://CYSB1.github.io/retarget-io/html/index.html)
+* [API Reference Guide](https://cypresssemiconductorco.github.io/retarget-io/html/index.html)
 * [Cypress Semiconductor, an Infineon Technologies Company](http://www.cypress.com)
 * [Cypress Semiconductor GitHub](https://github.com/cypresssemiconductorco)
 * [ModusToolbox](https://www.cypress.com/products/modustoolbox-software-environment)
