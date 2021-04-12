@@ -174,7 +174,9 @@ cyhal_uart_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 
 <p>Initialization function for redirecting low level IO commands to allow sending messages over a UART interface. </p>
-<p>This will setup the communication interface to allow using printf and related functions. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>This will setup the communication interface to allow using printf and related functions.</p>
+<p>In an RTOS environment, this function must be called after the RTOS has been initialized.</p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">tx</td><td>UART TX pin </td></tr>
     <tr><td class="paramname">rx</td><td>UART RX pin </td></tr>

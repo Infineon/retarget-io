@@ -8,6 +8,10 @@ A utility library to retarget the standard input/output (STDIO) messages to a UA
 * Thread safe write for NewLib
 
 ### What Changed?
+#### v1.2.0
+* Improve error handling
+* Add de-initialization of the mutex to `cy_retarget_io_deinit`
+* Update documentation for integration of the library in a RTOS environment.
 #### v1.1.1
 * Minor update for documentation & branding
 #### v1.1.0
@@ -21,10 +25,12 @@ This version of the Retarget IO was validated for compatibility with the followi
 
 | Software and Tools                        | Version |
 | :---                                      | :----:  |
-| ModusToolbox Software Environment         | 2.0     |
-| GCC Compiler                              | 7.4     |
-| IAR Compiler                              | 8.32    |
+| ModusToolbox Software Environment         | 2.2.1   |
+| GCC Compiler                              | 9.3.1   |
+| IAR Compiler                              | 8.4     |
 | ARM Compiler 6                            | 6.11    |
+
+Minimum required ModusToolbox Software Environment: v2.0
 
 ### More information
 
@@ -37,4 +43,4 @@ This version of the Retarget IO was validated for compatibility with the followi
 * [PSoC 6 Resources - KBA223067](https://community.cypress.com/docs/DOC-14644)
 
 ---
-© Cypress Semiconductor Corporation, 2019-2020.
+© Cypress Semiconductor Corporation, 2019-2021.

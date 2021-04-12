@@ -10,6 +10,9 @@ A utility library to retarget the standard input/output (STDIO) messages to a UA
 
 **NOTE:** If the application is built using newlib-nano, by default, floating point format strings (%f) are not supported. To enable this support, you must add `-u _printf_float` to the linker command line.
 
+# RTOS Integration
+To avoid concurrent access to the UART peripheral in a RTOS environment, the ARM and IAR libraries use mutexes to control access to stdio streams. For Newlib (GCC_ARM), the mutex must be implemented in _write() and can be enabled by adding `DEFINES+=CY_RTOS_AWARE` to the Makefile. For all libraries, the program must start the RTOS kernel before calling any stdio functions.
+
 ### Quick Start
 1. Add `#include "cy_retarget_io.h"`
 2. Call `cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);`
@@ -32,4 +35,4 @@ If you want to use only '\\n' instead of "\r\n" for printing a new line using pr
 * [PSoC 6 Resources - KBA223067](https://community.cypress.com/docs/DOC-14644)
 
 ---
-© Cypress Semiconductor Corporation, 2019-2020.
+© Cypress Semiconductor Corporation, 2019-2021.
