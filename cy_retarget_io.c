@@ -7,7 +7,9 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021 Cypress Semiconductor Corporation
+* Copyright 2018-2021 Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation
+*
 * SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +29,7 @@
 #include "cyhal_hw_types.h"
 #include "cyhal_uart.h"
 #include "cy_utils.h"
+#include "cyhal_system.h"
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -534,14 +537,19 @@ cy_rslt_t cy_retarget_io_init(cyhal_gpio_t tx, cyhal_gpio_t rx, uint32_t baudrat
 {
     const cyhal_uart_cfg_t uart_config =
     {
-        .data_bits      = 8,
-        .stop_bits      = 1,
-        .parity         = CYHAL_UART_PARITY_NONE,
-        .rx_buffer      = NULL,
-        .rx_buffer_size = 0,
+        .data_bits          = 8,
+        .stop_bits          = 1,
+        .parity             = CYHAL_UART_PARITY_NONE,
+        .rx_buffer          = NULL,
+        .rx_buffer_size     = 0
     };
 
+    #if (CYHAL_API_VERSION >= 2)
+    cy_rslt_t result =
+        cyhal_uart_init(&cy_retarget_io_uart_obj, tx, rx, NC, NC, NULL, &uart_config);
+    #else // HAL API version 1
     cy_rslt_t result = cyhal_uart_init(&cy_retarget_io_uart_obj, tx, rx, NULL, &uart_config);
+    #endif
 
     if (result == CY_RSLT_SUCCESS)
     {
@@ -558,10 +566,33 @@ cy_rslt_t cy_retarget_io_init(cyhal_gpio_t tx, cyhal_gpio_t rx, uint32_t baudrat
 
 
 //--------------------------------------------------------------------------------------------------
+// cy_retarget_io_is_tx_active
+//--------------------------------------------------------------------------------------------------
+bool cy_retarget_io_is_tx_active()
+{
+    return cyhal_uart_is_tx_active(&cy_retarget_io_uart_obj);
+}
+
+
+//--------------------------------------------------------------------------------------------------
 // cy_retarget_io_deinit
 //--------------------------------------------------------------------------------------------------
-void cy_retarget_io_deinit()
+void cy_retarget_io_deinit(void)
 {
+    // Since the largest hardware buffer would be 256 bytes
+    // it takes about 500 ms to transmit the 256 bytes at 9600 baud.
+    // Thus 1000 ms gives roughly 50% padding to this time.
+    int timeout_remaining_ms = 1000;
+    while (timeout_remaining_ms > 0)
+    {
+        if (!cy_retarget_io_is_tx_active())
+        {
+            break;
+        }
+        cyhal_system_delay_ms(1);
+        timeout_remaining_ms--;
+    }
+    CY_ASSERT(timeout_remaining_ms != 0);
     cyhal_uart_free(&cy_retarget_io_uart_obj);
     cy_retarget_io_mutex_deinit();
 }

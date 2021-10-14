@@ -14,7 +14,9 @@
  *
  ***************************************************************************************************
  * \copyright
- * Copyright 2018-2021 Cypress Semiconductor Corporation
+ * Copyright 2018-2021 Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation
+ *
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -77,6 +79,12 @@ extern cyhal_uart_t cy_retarget_io_uart_obj;
  * what went wrong
  */
 cy_rslt_t cy_retarget_io_init(cyhal_gpio_t tx, cyhal_gpio_t rx, uint32_t baudrate);
+
+/**
+ * \brief Checks whether there is data waiting to be written to the serial console.
+ * \returns true if there are pending TX transactions, otherwise false
+ */
+bool cy_retarget_io_is_tx_active();
 
 /**
  * \brief Releases the UART interface allowing it to be used for other purposes.
