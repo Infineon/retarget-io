@@ -7,7 +7,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2021 Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2018-2022 Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation
 *
 * SPDX-License-Identifier: Apache-2.0
@@ -103,6 +103,7 @@ static void cy_retarget_io_mutex_deinit(void)
     {
         abort();
     }
+    cy_retarget_io_mutex_initialized = false;
 }
 
 
@@ -355,11 +356,11 @@ __attribute__((weak)) int _read(int fd, char* ptr, int len)
 {
     (void)fd;
 
-    cy_rslt_t rslt;
     int nChars = 0;
     if (ptr != NULL)
     {
-        for (; nChars < len; ++ptr)
+        cy_rslt_t rslt;
+        do
         {
             rslt = cy_retarget_io_getchar(ptr);
             if (rslt == CY_RSLT_SUCCESS)
@@ -369,13 +370,11 @@ __attribute__((weak)) int _read(int fd, char* ptr, int len)
                 {
                     break;
                 }
+                ptr++;
             }
-            else
-            {
-                break;
-            }
-        }
+        } while ((rslt == CY_RSLT_SUCCESS) && (nChars < len));
     }
+
     return (nChars);
 }
 
@@ -531,9 +530,12 @@ char __attribute__((weak)) *_sys_command_string(char* cmd, int len)
 #endif // ARM-MDK
 
 //--------------------------------------------------------------------------------------------------
-// cy_retarget_io_init
+// cy_retarget_io_init_fc
+//
+// Enables user to provide flow control pins during initialization
 //--------------------------------------------------------------------------------------------------
-cy_rslt_t cy_retarget_io_init(cyhal_gpio_t tx, cyhal_gpio_t rx, uint32_t baudrate)
+cy_rslt_t cy_retarget_io_init_fc(cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t cts,
+                                 cyhal_gpio_t rts, uint32_t baudrate)
 {
     const cyhal_uart_cfg_t uart_config =
     {
@@ -545,10 +547,14 @@ cy_rslt_t cy_retarget_io_init(cyhal_gpio_t tx, cyhal_gpio_t rx, uint32_t baudrat
     };
 
     #if (CYHAL_API_VERSION >= 2)
-    cy_rslt_t result =
-        cyhal_uart_init(&cy_retarget_io_uart_obj, tx, rx, NC, NC, NULL, &uart_config);
-    #else // HAL API version 1
+    cy_rslt_t result = cyhal_uart_init(&cy_retarget_io_uart_obj, tx, rx, cts, rts, NULL,
+                                       &uart_config);
+    #else // HAL API before version 2
     cy_rslt_t result = cyhal_uart_init(&cy_retarget_io_uart_obj, tx, rx, NULL, &uart_config);
+    if (result == CY_RSLT_SUCCESS)
+    {
+        result = cyhal_uart_set_flow_control(&cy_retarget_io_uart_obj, cts, rts);
+    }
     #endif
 
     if (result == CY_RSLT_SUCCESS)
@@ -568,7 +574,7 @@ cy_rslt_t cy_retarget_io_init(cyhal_gpio_t tx, cyhal_gpio_t rx, uint32_t baudrat
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_is_tx_active
 //--------------------------------------------------------------------------------------------------
-bool cy_retarget_io_is_tx_active()
+bool cy_retarget_io_is_tx_active(void)
 {
     return cyhal_uart_is_tx_active(&cy_retarget_io_uart_obj);
 }

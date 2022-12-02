@@ -8,6 +8,9 @@ A utility library to retarget the standard input/output (STDIO) messages to a UA
 * Thread safe write for NewLib
 
 ### What Changed?
+#### v1.4.0
+* Add cy_retarget_io_init_fc function to initialize with flow control pins
+* Mark mutex as no longer initialized after 'cy_retarget_io_deinit'
 #### v1.3.0
 * Added support for checking whether data is being transmitted and waiting until done before finishing the deinit process
 * Added support for using with HAL v1 or v2
@@ -46,4 +49,4 @@ Minimum required ModusToolbox™ Software Environment: v2.0
 * [PSoC™ 6 Resources - KBA223067](https://community.cypress.com/docs/DOC-14644)
 
 ---
-© Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2021.
+© Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2022.

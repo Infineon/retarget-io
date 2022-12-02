@@ -14,7 +14,7 @@
  *
  ***************************************************************************************************
  * \copyright
- * Copyright 2018-2021 Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2018-2022 Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -53,6 +53,22 @@ extern cyhal_uart_t cy_retarget_io_uart_obj;
 /** UART baud rate */
 #define CY_RETARGET_IO_BAUDRATE             (115200)
 
+/**
+ * \brief Initialization function for redirecting low level IO commands to allow
+ * sending messages over a UART interface. This will setup the communication
+ * interface to allow using printf and related functions.
+ *
+ * In an RTOS environment, this function must be called after the RTOS has been
+ * initialized.
+ *
+ * \param tx UART TX pin, if no TX pin use NC
+ * \param rx UART RX pin, if no RX pin use NC
+ * \param baudrate UART baudrate
+ * \returns CY_RSLT_SUCCESS if successfully initialized, else an error about
+ * what went wrong
+ */
+#define cy_retarget_io_init(tx, rx, baudrate) cy_retarget_io_init_fc(tx, rx, NC, NC, baudrate)
+
 #ifdef DOXYGEN
 
 /** Defining this macro enables conversion of line feed (LF) into carriage
@@ -66,25 +82,28 @@ extern cyhal_uart_t cy_retarget_io_uart_obj;
 
 /**
  * \brief Initialization function for redirecting low level IO commands to allow
- * sending messages over a UART interface. This will setup the communication
- * interface to allow using printf and related functions.
+ * sending messages over a UART interface with flow control. This will setup the
+ * communication interface to allow using printf and related functions.
  *
  * In an RTOS environment, this function must be called after the RTOS has been
  * initialized.
  *
- * \param tx UART TX pin
- * \param rx UART RX pin
+ * \param tx UART TX pin, if no TX pin use NC
+ * \param rx UART RX pin, if no RX pin use NC
+ * \param cts UART CTS pin, if no CTS pin use NC
+ * \param rts UART RTS pin, if no RTS pin use NC
  * \param baudrate UART baudrate
  * \returns CY_RSLT_SUCCESS if successfully initialized, else an error about
  * what went wrong
  */
-cy_rslt_t cy_retarget_io_init(cyhal_gpio_t tx, cyhal_gpio_t rx, uint32_t baudrate);
+cy_rslt_t cy_retarget_io_init_fc(cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t cts,
+                                 cyhal_gpio_t rts, uint32_t baudrate);
 
 /**
  * \brief Checks whether there is data waiting to be written to the serial console.
  * \returns true if there are pending TX transactions, otherwise false
  */
-bool cy_retarget_io_is_tx_active();
+bool cy_retarget_io_is_tx_active(void);
 
 /**
  * \brief Releases the UART interface allowing it to be used for other purposes.
