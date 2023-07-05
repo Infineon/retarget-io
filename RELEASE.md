@@ -8,6 +8,9 @@ A utility library to retarget the standard input/output (STDIO) messages to a UA
 * Thread safe write for NewLib
 
 ### What Changed?
+#### v1.5.0
+* Add a new macro `CY_RETARGET_IO_NO_FLOAT`. When defined, floating point string formatting support will be disabled,
+  allowing for flash savings in applications which do not need this functionality.
 #### v1.4.0
 * Add cy_retarget_io_init_fc function to initialize with flow control pins
 * Mark mutex as no longer initialized after 'cy_retarget_io_deinit'
@@ -31,10 +34,10 @@ This version of the Retarget IO was validated for compatibility with the followi
 
 | Software and Tools                        | Version |
 | :---                                      | :----:  |
-| ModusToolbox™ Software Environment        | 2.4.0   |
+| ModusToolbox™ Software Environment        | 3.0.0   |
 | GCC Compiler                              | 10.3.1  |
-| IAR Compiler                              | 8.4     |
-| ARM Compiler 6                            | 6.11    |
+| IAR Compiler                              | 9.3.1   |
+| ARM Compiler 6                            | 6.16    |
 
 Minimum required ModusToolbox™ Software Environment: v2.0
 
@@ -49,4 +52,4 @@ Minimum required ModusToolbox™ Software Environment: v2.0
 * [PSoC™ 6 Resources - KBA223067](https://community.cypress.com/docs/DOC-14644)
 
 ---
-© Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2022.
+© Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2023.

@@ -266,15 +266,17 @@ __weak size_t __write(int handle, const unsigned char* buffer, size_t size)
 
 
 #else // (__GNUC__)  GCC
+#if !defined(CY_RETARGET_IO_NO_FLOAT)
 // Add an explicit reference to the floating point printf library to allow the usage of floating
 // point conversion specifier.
 __asm(".global _printf_float");
+#endif
 //--------------------------------------------------------------------------------------------------
 // _write
 //--------------------------------------------------------------------------------------------------
-__attribute__((weak)) int _write(int fd, const char* ptr, int len)
+__attribute__((weak)) int32_t _write(int32_t fd, const cy_char8_t* ptr, int32_t len)
 {
-    int nChars = 0;
+    int32_t nChars = 0;
     (void)fd;
     if (ptr != NULL)
     {
@@ -346,17 +348,19 @@ __weak size_t __read(int handle, unsigned char* buffer, size_t size)
 
 
 #else // (__GNUC__)  GCC
+#if !defined(CY_RETARGET_IO_NO_FLOAT)
 // Add an explicit reference to the floating point scanf library to allow the usage of floating
 // point conversion specifier.
 __asm(".global _scanf_float");
+#endif
 //--------------------------------------------------------------------------------------------------
 // _read
 //--------------------------------------------------------------------------------------------------
-__attribute__((weak)) int _read(int fd, char* ptr, int len)
+__attribute__((weak)) int32_t _read(int32_t fd, cy_char8_t* ptr, int32_t len)
 {
     (void)fd;
 
-    int nChars = 0;
+    int32_t nChars = 0;
     if (ptr != NULL)
     {
         cy_rslt_t rslt;
@@ -588,7 +592,7 @@ void cy_retarget_io_deinit(void)
     // Since the largest hardware buffer would be 256 bytes
     // it takes about 500 ms to transmit the 256 bytes at 9600 baud.
     // Thus 1000 ms gives roughly 50% padding to this time.
-    int timeout_remaining_ms = 1000;
+    int32_t timeout_remaining_ms = 1000;
     while (timeout_remaining_ms > 0)
     {
         if (!cy_retarget_io_is_tx_active())

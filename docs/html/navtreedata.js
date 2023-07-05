@@ -25,15 +25,7 @@
 var NAVTREE =
 [
   [ "Retarget IO (retarget-io)", "index.html", [
-    [ "Retarget IO", "index.html", [
-      [ "RTOS Integration", "index.html#autotoc_md2", [
-        [ "Overview", "index.html#autotoc_md1", [
-          [ "Quick Start", "index.html#autotoc_md3", null ],
-          [ "Enabling Conversion of '\\n' into \"\\r\\n\"", "index.html#autotoc_md4", null ],
-          [ "More information", "index.html#autotoc_md5", null ]
-        ] ]
-      ] ]
-    ] ],
+    [ "Retarget IO", "index.html", null ],
     [ "API Reference", "group__group__board__libs.html", null ]
   ] ]
 ];

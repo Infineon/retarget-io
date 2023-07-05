@@ -92,11 +92,12 @@ Overview</h2>
 <p >A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using <code>printf()</code>. You can specify the TX pin, RX pin, and the baud rate through the <code><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init()</a></code> function. The UART HAL object is externally accessible so that you can use it with other UART HAL functions.</p>
 <p ><b>NOTE:</b> The standard library is not standard in how it treats an I/O stream. Some implement a data buffer by default. The buffer is not flushed until it is full. In that case it may appear that your I/O is not working. You should be aware of how the library buffers data, and you should identify a buffering strategy and buffer size for a specified stream. If you supply a buffer, it must exist until the stream is closed. The following line of code disables the buffer for the standard library that accompanies the GCC compiler: </p><pre class="fragment">setvbuf( stdin, NULL, _IONBF, 0 );
 </pre><p> <b>NOTE:</b> If the application is built using newlib-nano, by default, floating point format strings (f) are not supported. To enable this support, you must add <code>-u _printf_float</code> to the linker command line.</p>
-<h1><a class="anchor" id="autotoc_md2"></a>
-RTOS Integration</h1>
+<p ><b>NOTE:</b> In general, console prints such as printf() should not be performed in ISR context. It must definitely not be called in ISR context when <code>CY_RTOS_AWARE</code> is defined, as the threat safety implementation disallows such calls.</p>
+<h2><a class="anchor" id="autotoc_md2"></a>
+RTOS Integration</h2>
 <p >To avoid concurrent access to the UART peripheral in a RTOS environment, the ARM and IAR libraries use mutexes to control access to stdio streams. For Newlib (GCC_ARM), the mutex must be implemented in _write() and can be enabled by adding <code>DEFINES+=CY_RTOS_AWARE</code> to the Makefile. For all libraries, the program must start the RTOS kernel before calling any stdio functions.</p>
-<h3><a class="anchor" id="autotoc_md3"></a>
-Quick Start</h3>
+<h2><a class="anchor" id="autotoc_md3"></a>
+Quick Start</h2>
 <ol type="1">
 <li>Add #<code>include "cy_retarget_io.h"</code></li>
 <li><p class="startli">Call <code><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE)</a>;</code></p>
@@ -104,11 +105,14 @@ Quick Start</h3>
 </li>
 <li>Start printing using <code>printf()</code></li>
 </ol>
-<h3><a class="anchor" id="autotoc_md4"></a>
-Enabling Conversion of '\n' into "\r\n"</h3>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Enabling Conversion of '\n' into "\r\n"</h2>
 <p >If you want to use only '\n' instead of "\r\n" for printing a new line using printf(), define the macro <code>CY_RETARGET_IO_CONVERT_LF_TO_CRLF</code> using the <em>DEFINES</em> variable in the application Makefile. The library will then append '\r' before '\n' character on the output direction (STDOUT). No conversion occurs if "\r\n" is already present.</p>
-<h3><a class="anchor" id="autotoc_md5"></a>
-More information</h3>
+<h2><a class="anchor" id="autotoc_md5"></a>
+Floating Point Support</h2>
+<p >By default, floating point support is enabled in printf. If floating point values will not be used in printed strings, this functionality can be disabled to reduece flash consumption. To disable floating support, add the following to the application makefile: <code>DEFINES += CY_RETARGET_IO_NO_FLOAT</code>.</p>
+<h2><a class="anchor" id="autotoc_md6"></a>
+More information</h2>
 <ul>
 <li><a href="https://infineon.github.io/retarget-io/html/index.html">API Reference Guide</a></li>
 <li><a href="http://www.cypress.com">Cypress Semiconductor, an Infineon Technologies Company</a></li>
@@ -119,7 +123,7 @@ More information</h3>
 <li><a href="https://community.cypress.com/docs/DOC-14644">PSoC™ 6 Resources - KBA223067</a></li>
 </ul>
 <hr  />
-<p> © Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2021. </p>
+<p> © Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2023. </p>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
