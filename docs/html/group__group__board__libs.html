@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Retarget IO (retarget-io)</title>
+<title>(retarget-io)</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="logo.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Retarget IO (retarget-io)</div>
+   <div id="projectname">(retarget-io)</div>
   </td>
  </tr>
  </tbody>
@@ -85,8 +85,7 @@ $(document).ready(function(){initNavTree('group__group__board__libs.html',''); i
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">Retarget IO</div></div>
 </div><!--header-->
 <div class="contents">
@@ -94,81 +93,44 @@ $(document).ready(function(){initNavTree('group__group__board__libs.html',''); i
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:gabb0b30d1e6a6c7e301b2b74450be762d"><td class="memItemLeft" align="right" valign="top"><a id="gabb0b30d1e6a6c7e301b2b74450be762d" name="gabb0b30d1e6a6c7e301b2b74450be762d"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>CY_RETARGET_IO_BAUDRATE</b>&#160;&#160;&#160;(115200)</td></tr>
-<tr class="memdesc:gabb0b30d1e6a6c7e301b2b74450be762d"><td class="mdescLeft">&#160;</td><td class="mdescRight">UART baud rate. <br /></td></tr>
+<tr class="memitem:gaaa709563e2b41d46584a9307df4f1386"><td class="memItemLeft" align="right" valign="top"><a id="gaaa709563e2b41d46584a9307df4f1386" name="gaaa709563e2b41d46584a9307df4f1386"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CY_RETARGET_IO_RSLT_NULL_UART_PTR</b>&#160;&#160;&#160;    (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_BOARD_LIB_RETARGET_IO, 0))</td></tr>
+<tr class="memdesc:gaaa709563e2b41d46584a9307df4f1386"><td class="mdescLeft">&#160;</td><td class="mdescRight">A null pointer was passed as a function parameter. <br /></td></tr>
+<tr class="separator:gaaa709563e2b41d46584a9307df4f1386"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabb0b30d1e6a6c7e301b2b74450be762d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gabb0b30d1e6a6c7e301b2b74450be762d">CY_RETARGET_IO_BAUDRATE</a>&#160;&#160;&#160;(115200)</td></tr>
+<tr class="memdesc:gabb0b30d1e6a6c7e301b2b74450be762d"><td class="mdescLeft">&#160;</td><td class="mdescRight">UART HAL object used by this library.  <a href="group__group__board__libs.html#gabb0b30d1e6a6c7e301b2b74450be762d">More...</a><br /></td></tr>
 <tr class="separator:gabb0b30d1e6a6c7e301b2b74450be762d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaddff65f18135a8491811ee3886e69707"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707">cy_retarget_io_init</a>(tx,  rx,  baudrate)&#160;&#160;&#160;<a class="el" href="group__group__board__libs.html#gacb7b45b0b8f0aef59b790415c14496a8">cy_retarget_io_init_fc</a>(tx, rx, NC, NC, baudrate)</td></tr>
-<tr class="memdesc:gaddff65f18135a8491811ee3886e69707"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization function for redirecting low level IO commands to allow sending messages over a UART interface.  <a href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707">More...</a><br /></td></tr>
-<tr class="separator:gaddff65f18135a8491811ee3886e69707"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8412e89ceaeefb3ab3d75509ab99680b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga8412e89ceaeefb3ab3d75509ab99680b">CY_RETARGET_IO_CONVERT_LF_TO_CRLF</a></td></tr>
 <tr class="memdesc:ga8412e89ceaeefb3ab3d75509ab99680b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defining this macro enables conversion of line feed (LF) into carriage return followed by line feed (CR &amp; LF) on the output direction (STDOUT).  <a href="group__group__board__libs.html#ga8412e89ceaeefb3ab3d75509ab99680b">More...</a><br /></td></tr>
 <tr class="separator:ga8412e89ceaeefb3ab3d75509ab99680b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gacb7b45b0b8f0aef59b790415c14496a8"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gacb7b45b0b8f0aef59b790415c14496a8">cy_retarget_io_init_fc</a> (cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t cts, cyhal_gpio_t rts, uint32_t baudrate)</td></tr>
-<tr class="memdesc:gacb7b45b0b8f0aef59b790415c14496a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization function for redirecting low level IO commands to allow sending messages over a UART interface with flow control.  <a href="group__group__board__libs.html#gacb7b45b0b8f0aef59b790415c14496a8">More...</a><br /></td></tr>
-<tr class="separator:gacb7b45b0b8f0aef59b790415c14496a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4905a76eaea9b40111887f5b6ff7d252"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga4905a76eaea9b40111887f5b6ff7d252">cy_retarget_io_init</a> (CySCB_Type *uart)</td></tr>
+<tr class="memdesc:ga4905a76eaea9b40111887f5b6ff7d252"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization function for redirecting low level IO commands to allow sending messages over a UART interface with a configurator generated configuration struct.  <a href="group__group__board__libs.html#ga4905a76eaea9b40111887f5b6ff7d252">More...</a><br /></td></tr>
+<tr class="separator:ga4905a76eaea9b40111887f5b6ff7d252"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8794fce4e5de7f40e667dcbf123ea462"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga8794fce4e5de7f40e667dcbf123ea462">cy_retarget_io_is_tx_active</a> (void)</td></tr>
 <tr class="memdesc:ga8794fce4e5de7f40e667dcbf123ea462"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether there is data waiting to be written to the serial console.  <a href="group__group__board__libs.html#ga8794fce4e5de7f40e667dcbf123ea462">More...</a><br /></td></tr>
 <tr class="separator:ga8794fce4e5de7f40e667dcbf123ea462"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa3ec2f7eab2ff27d716f2b22d90ff514"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gaa3ec2f7eab2ff27d716f2b22d90ff514">cy_retarget_io_deinit</a> (void)</td></tr>
 <tr class="memdesc:gaa3ec2f7eab2ff27d716f2b22d90ff514"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the UART interface allowing it to be used for other purposes.  <a href="group__group__board__libs.html#gaa3ec2f7eab2ff27d716f2b22d90ff514">More...</a><br /></td></tr>
 <tr class="separator:gaa3ec2f7eab2ff27d716f2b22d90ff514"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:gacde12f44b3729c38a0aa85f7679054c9"><td class="memItemLeft" align="right" valign="top"><a id="gacde12f44b3729c38a0aa85f7679054c9" name="gacde12f44b3729c38a0aa85f7679054c9"></a>
-cyhal_uart_t&#160;</td><td class="memItemRight" valign="bottom"><b>cy_retarget_io_uart_obj</b></td></tr>
-<tr class="memdesc:gacde12f44b3729c38a0aa85f7679054c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">UART HAL object used by this library. <br /></td></tr>
-<tr class="separator:gacde12f44b3729c38a0aa85f7679054c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="gaddff65f18135a8491811ee3886e69707" name="gaddff65f18135a8491811ee3886e69707"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaddff65f18135a8491811ee3886e69707">&#9670;&nbsp;</a></span>cy_retarget_io_init</h2>
+<a id="gabb0b30d1e6a6c7e301b2b74450be762d" name="gabb0b30d1e6a6c7e301b2b74450be762d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gabb0b30d1e6a6c7e301b2b74450be762d">&#9670;&nbsp;</a></span>CY_RETARGET_IO_BAUDRATE</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define cy_retarget_io_init</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">tx, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">rx, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">baudrate&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="group__group__board__libs.html#gacb7b45b0b8f0aef59b790415c14496a8">cy_retarget_io_init_fc</a>(tx, rx, NC, NC, baudrate)</td>
+          <td class="memname">#define CY_RETARGET_IO_BAUDRATE&#160;&#160;&#160;(115200)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialization function for redirecting low level IO commands to allow sending messages over a UART interface. </p>
-<p >This will setup the communication interface to allow using printf and related functions.</p>
-<p >In an RTOS environment, this function must be called after the RTOS has been initialized.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">tx</td><td>UART TX pin, if no TX pin use NC </td></tr>
-    <tr><td class="paramname">rx</td><td>UART RX pin, if no RX pin use NC </td></tr>
-    <tr><td class="paramname">baudrate</td><td>UART baudrate </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if successfully initialized, else an error about what went wrong </dd></dl>
+<p>UART HAL object used by this library. </p>
+<p >UART baud rate </p>
 
 </div>
 </div>
@@ -190,64 +152,33 @@ cyhal_uart_t&#160;</td><td class="memItemRight" valign="bottom"><b>cy_retarget_i
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="gacb7b45b0b8f0aef59b790415c14496a8" name="gacb7b45b0b8f0aef59b790415c14496a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gacb7b45b0b8f0aef59b790415c14496a8">&#9670;&nbsp;</a></span>cy_retarget_io_init_fc()</h2>
+<a id="ga4905a76eaea9b40111887f5b6ff7d252" name="ga4905a76eaea9b40111887f5b6ff7d252"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4905a76eaea9b40111887f5b6ff7d252">&#9670;&nbsp;</a></span>cy_retarget_io_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">cy_rslt_t cy_retarget_io_init_fc </td>
+          <td class="memname">cy_rslt_t cy_retarget_io_init </td>
           <td>(</td>
-          <td class="paramtype">cyhal_gpio_t&#160;</td>
-          <td class="paramname"><em>tx</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">CySCB_Type *&#160;</td>
+          <td class="paramname"><em>uart</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">cyhal_gpio_t&#160;</td>
-          <td class="paramname"><em>rx</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">cyhal_gpio_t&#160;</td>
-          <td class="paramname"><em>cts</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">cyhal_gpio_t&#160;</td>
-          <td class="paramname"><em>rts</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>baudrate</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialization function for redirecting low level IO commands to allow sending messages over a UART interface with flow control. </p>
+<p>Initialization function for redirecting low level IO commands to allow sending messages over a UART interface with a configurator generated configuration struct. </p>
 <p >This will setup the communication interface to allow using printf and related functions.</p>
-<p >In an RTOS environment, this function must be called after the RTOS has been initialized.</p>
+<p >This function assumes that you've already 1) initialized, and 2) enabled the UART instance using PDL function calls.</p>
+<p >When not using the HAL, retarget-io is not thread safe. Consider using printf from a single thread or using a mutex to protect the printf calls.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">tx</td><td>UART TX pin, if no TX pin use NC </td></tr>
-    <tr><td class="paramname">rx</td><td>UART RX pin, if no RX pin use NC </td></tr>
-    <tr><td class="paramname">cts</td><td>UART CTS pin, if no CTS pin use NC </td></tr>
-    <tr><td class="paramname">rts</td><td>UART RTS pin, if no RTS pin use NC </td></tr>
-    <tr><td class="paramname">baudrate</td><td>UART baudrate </td></tr>
+    <tr><td class="paramname">uart</td><td>Pointer to UART object, usually named and defined in device-configurator.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if successfully initialized, else an error about what went wrong </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if successfully initialized, else an error if the UART parameter is a null pointer. </dd></dl>
 
 </div>
 </div>
@@ -299,7 +230,7 @@ cyhal_uart_t&#160;</td><td class="memItemRight" valign="bottom"><b>cy_retarget_i
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>Retarget IO (retarget-io)</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>(retarget-io)</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

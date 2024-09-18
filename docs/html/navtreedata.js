@@ -24,9 +24,9 @@
 */
 var NAVTREE =
 [
-  [ "Retarget IO (retarget-io)", "index.html", [
+  [ "(retarget-io)", "index.html", [
     [ "Retarget IO", "index.html", null ],
-    [ "API Reference", "group__group__board__libs.html", null ]
+    [ "API Reference", "modules.html", "modules" ]
   ] ]
 ];
 

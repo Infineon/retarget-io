@@ -6,8 +6,12 @@ A utility library to retarget the standard input/output (STDIO) messages to a UA
 * printf() support over a UART terminal
 * Support for GCC, IAR, and ARM toolchains
 * Thread safe write for NewLib
+* Optional PDL-only support
 
 ### What Changed?
+#### v1.6.0
+* Added support for PDL-only.  When CY_USING_HAL is not defined, only the PDL will be used to support printf() functionality.
+* Changed declaration of putc override for ARM compiler to align with latest ARM guidance.
 #### v1.5.0
 * Add a new macro `CY_RETARGET_IO_NO_FLOAT`. When defined, floating point string formatting support will be disabled,
   allowing for flash savings in applications which do not need this functionality.
@@ -36,7 +40,7 @@ This version of the Retarget IO was validated for compatibility with the followi
 | :---                                      | :----:  |
 | ModusToolbox™ Software Environment        | 3.0.0   |
 | GCC Compiler                              | 10.3.1  |
-| IAR Compiler                              | 9.3.1   |
+| IAR Compiler                              | 9.40.2  |
 | ARM Compiler 6                            | 6.16    |
 
 Minimum required ModusToolbox™ Software Environment: v2.0

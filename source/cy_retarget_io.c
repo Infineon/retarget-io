@@ -26,12 +26,17 @@
 *******************************************************************************/
 
 #include "cy_retarget_io.h"
+
+#include <stdbool.h>
+#include <stdlib.h>
+
+#if defined (CY_USING_HAL)
 #include "cyhal_hw_types.h"
 #include "cyhal_uart.h"
 #include "cy_utils.h"
 #include "cyhal_system.h"
-#include <stdbool.h>
-#include <stdlib.h>
+#endif
+
 
 #if (defined(CY_RTOS_AWARE) || defined(COMPONENT_RTOS_AWARE)) && defined(__GNUC__) && \
     !defined(__ARMCC_VERSION) && !defined(__clang__)
@@ -162,8 +167,13 @@ static inline void cy_retarget_io_mutex_deinit(void)
 extern "C" {
 #endif
 
+#if defined (CY_USING_HAL)
 // UART HAL object used by BSP for Debug UART port
 cyhal_uart_t cy_retarget_io_uart_obj;
+#else
+// SCB address that will be used for retarget-io UART
+static CySCB_Type* cy_retarget_io_uart = NULL;
+#endif
 
 // Tracks the previous character sent to output stream
 #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
@@ -175,7 +185,12 @@ static char cy_retarget_io_stdout_prev_char = 0;
 //--------------------------------------------------------------------------------------------------
 static inline cy_rslt_t cy_retarget_io_getchar(char* c)
 {
+    #if defined (CY_USING_HAL)
     return cyhal_uart_getc(&cy_retarget_io_uart_obj, (uint8_t*)c, 0);
+    #else
+    *c = (uint8_t)Cy_SCB_UART_Get(cy_retarget_io_uart);
+    return CY_RSLT_SUCCESS;
+    #endif
 }
 
 
@@ -184,7 +199,16 @@ static inline cy_rslt_t cy_retarget_io_getchar(char* c)
 //--------------------------------------------------------------------------------------------------
 static inline cy_rslt_t cy_retarget_io_putchar(char c)
 {
+    #if defined(CY_USING_HAL)
     return cyhal_uart_putc(&cy_retarget_io_uart_obj, (uint8_t)c);
+    #else
+    uint32_t count = 0;
+    while (count == 0)
+    {
+        count = Cy_SCB_UART_Put(cy_retarget_io_uart, c);
+    }
+    return CY_RSLT_SUCCESS;
+    #endif
 }
 
 
@@ -192,7 +216,7 @@ static inline cy_rslt_t cy_retarget_io_putchar(char c)
 //--------------------------------------------------------------------------------------------------
 // fputc
 //--------------------------------------------------------------------------------------------------
-__attribute__((weak)) int fputc(int ch, FILE* f)
+int $Sub$$fputc(int ch, FILE* f)
 {
     (void)f;
     cy_rslt_t rslt = CY_RSLT_SUCCESS;
@@ -533,6 +557,7 @@ char __attribute__((weak)) *_sys_command_string(char* cmd, int len)
 
 #endif // ARM-MDK
 
+#if defined(CY_USING_HAL)
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_init_fc
 //
@@ -575,15 +600,57 @@ cy_rslt_t cy_retarget_io_init_fc(cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t 
 }
 
 
+#else // if defined(CY_USING_HAL)
+
+//--------------------------------------------------------------------------------------------------
+// cy_retarget_io_init
+//
+// Initializes the UART for retarget-io.  UART must already be initialized and enabled.
+//--------------------------------------------------------------------------------------------------
+cy_rslt_t cy_retarget_io_init(CySCB_Type* uart)
+{
+    if (uart == NULL)
+    {
+        return CY_RETARGET_IO_RSLT_NULL_UART_PTR;
+    }
+    else
+    {
+        cy_retarget_io_uart = uart;
+        return cy_retarget_io_mutex_init();
+    }
+}
+
+
+#endif // defined(CY_USING_HAL)
+
+#if defined(CY_USING_HAL)
+//--------------------------------------------------------------------------------------------------
+// cy_retarget_io_init_hal
+//
+// Initailize retarget-io mutex for thead-safe during initialization
+//--------------------------------------------------------------------------------------------------
+cy_rslt_t cy_retarget_io_init_hal(void)
+{
+    return cy_retarget_io_mutex_init();
+}
+
+
+#endif // defined(CY_USING_HAL)
+
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_is_tx_active
 //--------------------------------------------------------------------------------------------------
 bool cy_retarget_io_is_tx_active(void)
 {
+    #if defined (CY_USING_HAL)
     return cyhal_uart_is_tx_active(&cy_retarget_io_uart_obj);
+    #else
+    return !Cy_SCB_IsTxComplete(cy_retarget_io_uart);
+    #endif
 }
 
 
+#if defined(CY_USING_HAL)
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_deinit
 //--------------------------------------------------------------------------------------------------
@@ -607,6 +674,8 @@ void cy_retarget_io_deinit(void)
     cy_retarget_io_mutex_deinit();
 }
 
+
+#endif // if defined(CY_USING_HAL)
 
 #if defined(__cplusplus)
 }

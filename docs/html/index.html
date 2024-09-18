@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Retarget IO (retarget-io)</title>
+<title>(retarget-io)</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="logo.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Retarget IO (retarget-io)</div>
+   <div id="projectname">(retarget-io)</div>
   </td>
  </tr>
  </tbody>
@@ -86,32 +86,45 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
   <div class="headertitle"><div class="title">Retarget IO </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p ><a class="anchor" id="md_source_peripherals_retarget_io_README_doxygen"></a> </p>
+<div class="textblock"><p ><a class="anchor" id="md_output_README_doxygen"></a> </p>
 <h2><a class="anchor" id="autotoc_md1"></a>
 Overview</h2>
-<p >A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using <code>printf()</code>. You can specify the TX pin, RX pin, and the baud rate through the <code><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init()</a></code> function. The UART HAL object is externally accessible so that you can use it with other UART HAL functions.</p>
+<p >A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using <code>printf()</code>. You can specify the TX pin, RX pin, and the baud rate through the <code><a class="el" href="group__group__board__libs.html#ga4905a76eaea9b40111887f5b6ff7d252" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init()</a></code> function. The UART HAL object is externally accessible so that you can use it with other UART HAL functions.</p>
 <p ><b>NOTE:</b> The standard library is not standard in how it treats an I/O stream. Some implement a data buffer by default. The buffer is not flushed until it is full. In that case it may appear that your I/O is not working. You should be aware of how the library buffers data, and you should identify a buffering strategy and buffer size for a specified stream. If you supply a buffer, it must exist until the stream is closed. The following line of code disables the buffer for the standard library that accompanies the GCC compiler: </p><pre class="fragment">setvbuf( stdin, NULL, _IONBF, 0 );
 </pre><p> <b>NOTE:</b> If the application is built using newlib-nano, by default, floating point format strings (f) are not supported. To enable this support, you must add <code>-u _printf_float</code> to the linker command line.</p>
 <p ><b>NOTE:</b> In general, console prints such as printf() should not be performed in ISR context. It must definitely not be called in ISR context when <code>CY_RTOS_AWARE</code> is defined, as the threat safety implementation disallows such calls.</p>
+<p >NOTE: If the application is built without HAL support (i.e., CY_USING_HAL is not defined), then the UART must be initialized using PDL function calls prior to being passed into the <code><a class="el" href="group__group__board__libs.html#ga4905a76eaea9b40111887f5b6ff7d252" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init()</a></code> function. See <em>Quick Start (PDL Only)</em> section below.</p>
 <h2><a class="anchor" id="autotoc_md2"></a>
 RTOS Integration</h2>
 <p >To avoid concurrent access to the UART peripheral in a RTOS environment, the ARM and IAR libraries use mutexes to control access to stdio streams. For Newlib (GCC_ARM), the mutex must be implemented in _write() and can be enabled by adding <code>DEFINES+=CY_RTOS_AWARE</code> to the Makefile. For all libraries, the program must start the RTOS kernel before calling any stdio functions.</p>
+<p >HAL support is required for retarget-io in an RTOS environment. If your project does not include HAL support, you must manually manage concurrency in your application.</p>
 <h2><a class="anchor" id="autotoc_md3"></a>
-Quick Start</h2>
+Quick Start (with HAL Support)</h2>
 <ol type="1">
 <li>Add #<code>include "cy_retarget_io.h"</code></li>
-<li><p class="startli">Call <code><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE)</a>;</code></p>
+<li><p class="startli">Call <code>cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);</code></p>
 <p class="startli"><code>CYBSP_DEBUG_UART_TX</code> and <code>CYBSP_DEBUG_UART_RX</code> pins are defined in the BSP and <code>CY_RETARGET_IO_BAUDRATE</code> is set to 115200. You can use a different baud rate if you prefer.</p>
 </li>
 <li>Start printing using <code>printf()</code></li>
 </ol>
 <h2><a class="anchor" id="autotoc_md4"></a>
+Quick Start (PDL Only)</h2>
+<p >These instructions apply when the UART interface is provided by the SCB peripheral directly using a PDL configured and initialized SCB object. Only relevant when HAL is unavailable. UART interfaces other than SCB are not supported at this time.</p>
+<ol type="1">
+<li>Add #<code>include "cy_retarget_io.h"</code></li>
+<li>Initialize and enable your UART hardware using PDL function calls. The DEBUG_UART must be defined and configured in the Device Configurator tool. <div class="fragment"><div class="line">Cy_SCB_UART_Init(DEBUG_UART_HW, &amp;DEBUG_UART_config, NULL);</div>
+<div class="line">Cy_SCB_UART_Enable(DEBUG_UART_HW);</div>
+</div><!-- fragment --></li>
+<li>Call <code>cy_retarget_io_init(DEBUG_UART_HW);</code></li>
+<li>Start printing using <code>printf()</code></li>
+</ol>
+<h2><a class="anchor" id="autotoc_md5"></a>
 Enabling Conversion of '\n' into "\r\n"</h2>
 <p >If you want to use only '\n' instead of "\r\n" for printing a new line using printf(), define the macro <code>CY_RETARGET_IO_CONVERT_LF_TO_CRLF</code> using the <em>DEFINES</em> variable in the application Makefile. The library will then append '\r' before '\n' character on the output direction (STDOUT). No conversion occurs if "\r\n" is already present.</p>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
 Floating Point Support</h2>
 <p >By default, floating point support is enabled in printf. If floating point values will not be used in printed strings, this functionality can be disabled to reduece flash consumption. To disable floating support, add the following to the application makefile: <code>DEFINES += CY_RETARGET_IO_NO_FLOAT</code>.</p>
-<h2><a class="anchor" id="autotoc_md6"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 More information</h2>
 <ul>
 <li><a href="https://infineon.github.io/retarget-io/html/index.html">API Reference Guide</a></li>
@@ -123,7 +136,7 @@ More information</h2>
 <li><a href="https://community.cypress.com/docs/DOC-14644">PSoC™ 6 Resources - KBA223067</a></li>
 </ul>
 <hr  />
-<p> © Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2023. </p>
+<p> © Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2024. </p>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -131,7 +144,7 @@ More information</h2>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>Retarget IO (retarget-io)</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>(retarget-io)</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

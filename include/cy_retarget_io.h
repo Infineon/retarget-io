@@ -41,18 +41,31 @@
 
 #include <stdio.h>
 #include "cy_result.h"
+#if defined (CY_USING_HAL)
 #include "cyhal_hw_types.h"
+#else
+#include "cy_pdl.h"
+#include <stdbool.h>
+#endif
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
+/* Define module errors */
+/** A null pointer was passed as a function parameter. */
+#define CY_RETARGET_IO_RSLT_NULL_UART_PTR    \
+    (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_BOARD_LIB_RETARGET_IO, 0))
+
 /** UART HAL object used by this library */
+#if defined (CY_USING_HAL)
 extern cyhal_uart_t cy_retarget_io_uart_obj;
+#endif
 
 /** UART baud rate */
 #define CY_RETARGET_IO_BAUDRATE             (115200)
 
+#if defined(CY_USING_HAL)
 /**
  * \brief Initialization function for redirecting low level IO commands to allow
  * sending messages over a UART interface. This will setup the communication
@@ -68,6 +81,7 @@ extern cyhal_uart_t cy_retarget_io_uart_obj;
  * what went wrong
  */
 #define cy_retarget_io_init(tx, rx, baudrate) cy_retarget_io_init_fc(tx, rx, NC, NC, baudrate)
+#endif // defined(CY_USING_HAL)
 
 #ifdef DOXYGEN
 
@@ -80,6 +94,7 @@ extern cyhal_uart_t cy_retarget_io_uart_obj;
 
 #endif // DOXYGEN
 
+#if defined(CY_USING_HAL)
 /**
  * \brief Initialization function for redirecting low level IO commands to allow
  * sending messages over a UART interface with flow control. This will setup the
@@ -98,6 +113,46 @@ extern cyhal_uart_t cy_retarget_io_uart_obj;
  */
 cy_rslt_t cy_retarget_io_init_fc(cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t cts,
                                  cyhal_gpio_t rts, uint32_t baudrate);
+#endif // defined(CY_USING_HAL)
+
+#if defined(CY_USING_HAL)
+/**
+ * \brief Initialization function for redirecting low level IO commands to allow
+ * sending messages over a UART interface with a configurator generated configuration
+ * struct. This will setup the communication interface to allow using printf and
+ * related functions.
+ *
+ * This function assumes that you've already initialized cy_retarget_io_uart_obj
+ * using some other mechanism.
+ *
+ * In an RTOS environment, this function must be called after the RTOS has been
+ * initialized.
+ *
+ * \returns CY_RSLT_SUCCESS if successfully initialized, else an error about
+ * what went wrong
+ */
+cy_rslt_t cy_retarget_io_init_hal(void);
+
+#else
+/**
+ * \brief Initialization function for redirecting low level IO commands to allow
+ * sending messages over a UART interface with a configurator generated configuration
+ * struct. This will setup the communication interface to allow using printf and
+ * related functions.
+ *
+ * This function assumes that you've already 1) initialized, and 2) enabled the
+ * UART instance using PDL function calls.
+ *
+ * When not using the HAL, retarget-io is not thread safe.  Consider using printf
+ * from a single thread or using a mutex to protect the printf calls.
+ *
+ * \param uart Pointer to UART object, usually named and defined in device-configurator.
+ *
+ * \returns CY_RSLT_SUCCESS if successfully initialized, else an error if the UART
+ * parameter is a null pointer.
+ */
+cy_rslt_t cy_retarget_io_init(CySCB_Type* uart);
+#endif // defined(CY_USING_HAL)
 
 /**
  * \brief Checks whether there is data waiting to be written to the serial console.
