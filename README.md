@@ -2,7 +2,7 @@
 
 ### Overview
 
-A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using `printf()`. You can specify the TX pin, RX pin, and the baud rate through the `cy_retarget_io_init()` function. The UART HAL object is externally accessible so that you can use it with other UART HAL functions.
+A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using `printf()`. You can specify the TX pin, RX pin, and the baud rate when configuring the UART.
 
 **NOTE:** The standard library is not standard in how it treats an I/O stream. Some implement a data buffer by default. The buffer is not flushed until it is full. In that case it may appear that your I/O is not working. You should be aware of how the library buffers data, and you should identify a buffering strategy and buffer size for a specified stream. If you supply a buffer, it must exist until the stream is closed. The following line of code disables the buffer for the standard library that accompanies the GCC compiler:
 
@@ -12,14 +12,23 @@ A utility library to retarget the standard input/output (STDIO) messages to a UA
 
 **NOTE:** In general, console prints such as printf() should not be performed in ISR context. It must definitely not be called in ISR context when `CY_RTOS_AWARE` is defined, as the threat safety implementation disallows such calls.
 
-NOTE: If the application is built without HAL support (i.e., CY_USING_HAL is not defined), then the UART must be initialized using PDL function calls prior to being passed into the `cy_retarget_io_init()` function.  See *Quick Start (PDL Only)* section below.
+NOTE: If the application is built without HAL support (i.e., neither `COMPONENT_MTB_HAL` nor `CY_USING_HAL` is defined), then the UART must be initialized using PDL function calls prior to being passed into the `cy_retarget_io_init()` function.  See *Quick Start (PDL Only)* section below.
 
 ### RTOS Integration
 To avoid concurrent access to the UART peripheral in a RTOS environment, the ARM and IAR libraries use mutexes to control access to stdio streams. For Newlib (GCC_ARM), the mutex must be implemented in _write() and can be enabled by adding `DEFINES+=CY_RTOS_AWARE` to the Makefile. For all libraries, the program must start the RTOS kernel before calling any stdio functions.
 
 HAL support is required for retarget-io in an RTOS environment.  If your project does not include HAL support, you must manually manage concurrency in your application.
 
-### Quick Start (with HAL Support)
+### Quick Start (with MTB-HAL(COMPONENT_MTB_HAL) Support)
+1. Configure the UART using the device configurator generated structures or through manually written config structures. Configuration includes the UART TX and RX pins, CTS/RTS pins if flow control is desired, Baud Rate and other UART config parameters
+2. Set up the clock source to the UART peripheral. This could be done using the device configurator or manually. Set up the clock divider value depending on the desired baud rate.
+3. Initialize the UART Hardware.
+4. Set up the HAL UART object.
+5. Add `#include "cy_retarget_io.h"`.
+6. Call `cy_retarget_io_init(&hal_uart_obj);`.
+7. Start printing using `printf()`.
+
+### Quick Start (with CY-HAL(CY_USING_HAL) Support)
 1. Add `#include "cy_retarget_io.h"`
 2. Call `cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);`
 

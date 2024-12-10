@@ -9,8 +9,14 @@ A utility library to retarget the standard input/output (STDIO) messages to a UA
 * Optional PDL-only support
 
 ### What Changed?
+#### v1.7.0
+* Added support for MTB HAL API version 3.
+* UART peripheral to be set up and initilalized as a prerquisite for using the retarget-io library.
+* cy_retarget_io_init function signature change. Init function needs a pre-initialized HAL UART object as input parameter.
+* cy_retarget_io_init_fc function removed.
+* Stopped exposing the HAL UART object.
 #### v1.6.0
-* Added support for PDL-only.  When CY_USING_HAL is not defined, only the PDL will be used to support printf() functionality.
+* Added support for PDL-only.  When COMPONENT_MTB_HAL or CY_USING_HAL is not defined, only the PDL will be used to support printf() functionality.
 * Changed declaration of putc override for ARM compiler to align with latest ARM guidance.
 #### v1.5.0
 * Add a new macro `CY_RETARGET_IO_NO_FLOAT`. When defined, floating point string formatting support will be disabled,

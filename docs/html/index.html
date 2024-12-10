@@ -89,17 +89,28 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="textblock"><p ><a class="anchor" id="md_output_README_doxygen"></a> </p>
 <h2><a class="anchor" id="autotoc_md1"></a>
 Overview</h2>
-<p >A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using <code>printf()</code>. You can specify the TX pin, RX pin, and the baud rate through the <code><a class="el" href="group__group__board__libs.html#ga4905a76eaea9b40111887f5b6ff7d252" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init()</a></code> function. The UART HAL object is externally accessible so that you can use it with other UART HAL functions.</p>
+<p >A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using <code>printf()</code>. You can specify the TX pin, RX pin, and the baud rate when configuring the UART.</p>
 <p ><b>NOTE:</b> The standard library is not standard in how it treats an I/O stream. Some implement a data buffer by default. The buffer is not flushed until it is full. In that case it may appear that your I/O is not working. You should be aware of how the library buffers data, and you should identify a buffering strategy and buffer size for a specified stream. If you supply a buffer, it must exist until the stream is closed. The following line of code disables the buffer for the standard library that accompanies the GCC compiler: </p><pre class="fragment">setvbuf( stdin, NULL, _IONBF, 0 );
 </pre><p> <b>NOTE:</b> If the application is built using newlib-nano, by default, floating point format strings (f) are not supported. To enable this support, you must add <code>-u _printf_float</code> to the linker command line.</p>
 <p ><b>NOTE:</b> In general, console prints such as printf() should not be performed in ISR context. It must definitely not be called in ISR context when <code>CY_RTOS_AWARE</code> is defined, as the threat safety implementation disallows such calls.</p>
-<p >NOTE: If the application is built without HAL support (i.e., CY_USING_HAL is not defined), then the UART must be initialized using PDL function calls prior to being passed into the <code><a class="el" href="group__group__board__libs.html#ga4905a76eaea9b40111887f5b6ff7d252" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init()</a></code> function. See <em>Quick Start (PDL Only)</em> section below.</p>
+<p >NOTE: If the application is built without HAL support (i.e., neither <code>COMPONENT_MTB_HAL</code> nor <code>CY_USING_HAL</code> is defined), then the UART must be initialized using PDL function calls prior to being passed into the <code><a class="el" href="group__group__board__libs.html#ga4905a76eaea9b40111887f5b6ff7d252" title="UART HAL object used by this library.">cy_retarget_io_init()</a></code> function. See <em>Quick Start (PDL Only)</em> section below.</p>
 <h2><a class="anchor" id="autotoc_md2"></a>
 RTOS Integration</h2>
 <p >To avoid concurrent access to the UART peripheral in a RTOS environment, the ARM and IAR libraries use mutexes to control access to stdio streams. For Newlib (GCC_ARM), the mutex must be implemented in _write() and can be enabled by adding <code>DEFINES+=CY_RTOS_AWARE</code> to the Makefile. For all libraries, the program must start the RTOS kernel before calling any stdio functions.</p>
 <p >HAL support is required for retarget-io in an RTOS environment. If your project does not include HAL support, you must manually manage concurrency in your application.</p>
 <h2><a class="anchor" id="autotoc_md3"></a>
-Quick Start (with HAL Support)</h2>
+Quick Start (with MTB-HAL(COMPONENT_MTB_HAL) Support)</h2>
+<ol type="1">
+<li>Configure the UART using the device configurator generated structures or through manually written config structures. Configuration includes the UART TX and RX pins, CTS/RTS pins if flow control is desired, Baud Rate and other UART config parameters</li>
+<li>Set up the clock source to the UART peripheral. This could be done using the device configurator or manually. Set up the clock divider value depending on the desired baud rate.</li>
+<li>Initialize the UART Hardware.</li>
+<li>Set up the HAL UART object.</li>
+<li>Add #<code>include "cy_retarget_io.h"</code>.</li>
+<li>Call <code>cy_retarget_io_init(&amp;hal_uart_obj);</code>.</li>
+<li>Start printing using <code>printf()</code>.</li>
+</ol>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Quick Start (with CY-HAL(CY_USING_HAL) Support)</h2>
 <ol type="1">
 <li>Add #<code>include "cy_retarget_io.h"</code></li>
 <li><p class="startli">Call <code>cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);</code></p>
@@ -107,7 +118,7 @@ Quick Start (with HAL Support)</h2>
 </li>
 <li>Start printing using <code>printf()</code></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md5"></a>
 Quick Start (PDL Only)</h2>
 <p >These instructions apply when the UART interface is provided by the SCB peripheral directly using a PDL configured and initialized SCB object. Only relevant when HAL is unavailable. UART interfaces other than SCB are not supported at this time.</p>
 <ol type="1">
@@ -118,13 +129,13 @@ Quick Start (PDL Only)</h2>
 <li>Call <code>cy_retarget_io_init(DEBUG_UART_HW);</code></li>
 <li>Start printing using <code>printf()</code></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
 Enabling Conversion of '\n' into "\r\n"</h2>
 <p >If you want to use only '\n' instead of "\r\n" for printing a new line using printf(), define the macro <code>CY_RETARGET_IO_CONVERT_LF_TO_CRLF</code> using the <em>DEFINES</em> variable in the application Makefile. The library will then append '\r' before '\n' character on the output direction (STDOUT). No conversion occurs if "\r\n" is already present.</p>
-<h2><a class="anchor" id="autotoc_md6"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 Floating Point Support</h2>
 <p >By default, floating point support is enabled in printf. If floating point values will not be used in printed strings, this functionality can be disabled to reduece flash consumption. To disable floating support, add the following to the application makefile: <code>DEFINES += CY_RETARGET_IO_NO_FLOAT</code>.</p>
-<h2><a class="anchor" id="autotoc_md7"></a>
+<h2><a class="anchor" id="autotoc_md8"></a>
 More information</h2>
 <ul>
 <li><a href="https://infineon.github.io/retarget-io/html/index.html">API Reference Guide</a></li>

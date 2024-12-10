@@ -26,22 +26,24 @@
 *******************************************************************************/
 
 #include "cy_retarget_io.h"
-
 #include <stdbool.h>
 #include <stdlib.h>
-
-#if defined (CY_USING_HAL)
+#include "cy_utils.h"
+#if defined(COMPONENT_MTB_HAL)
+#include "mtb_hal_hw_types.h"
+#include "mtb_hal_uart.h"
+#include "mtb_hal_system.h"
+#elif defined (CY_USING_HAL)
 #include "cyhal_hw_types.h"
 #include "cyhal_uart.h"
-#include "cy_utils.h"
 #include "cyhal_system.h"
-#endif
+#endif //defined(COMPONENT_MTB_HAL)
 
 
 #if (defined(CY_RTOS_AWARE) || defined(COMPONENT_RTOS_AWARE)) && defined(__GNUC__) && \
     !defined(__ARMCC_VERSION) && !defined(__clang__)
 
-// The cyhal_uart driver is not necessarily thread-safe. To avoid concurrent
+// The HAL UART driver is not necessarily thread-safe. To avoid concurrent
 // access, the ARM and IAR libraries use mutexes to control access to stdio
 // streams. For Newlib, the mutex must be implemented in _write(). For all
 // libraries, the program must start the RTOS kernel before calling any stdio
@@ -167,13 +169,17 @@ static inline void cy_retarget_io_mutex_deinit(void)
 extern "C" {
 #endif
 
-#if defined (CY_USING_HAL)
+#if defined(COMPONENT_MTB_HAL)
+// UART HAL object used by BSP for Debug UART port
+static mtb_hal_uart_t* cy_retarget_io_uart_obj = NULL;
+#elif defined(CY_USING_HAL)
 // UART HAL object used by BSP for Debug UART port
 cyhal_uart_t cy_retarget_io_uart_obj;
 #else
 // SCB address that will be used for retarget-io UART
 static CySCB_Type* cy_retarget_io_uart = NULL;
 #endif
+
 
 // Tracks the previous character sent to output stream
 #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
@@ -185,12 +191,21 @@ static char cy_retarget_io_stdout_prev_char = 0;
 //--------------------------------------------------------------------------------------------------
 static inline cy_rslt_t cy_retarget_io_getchar(char* c)
 {
-    #if defined (CY_USING_HAL)
+    #if defined(COMPONENT_MTB_HAL)
+    CY_ASSERT(NULL != cy_retarget_io_uart_obj);
+    return mtb_hal_uart_get(cy_retarget_io_uart_obj, (uint8_t*)c, 0);
+    #elif defined(CY_USING_HAL)
     return cyhal_uart_getc(&cy_retarget_io_uart_obj, (uint8_t*)c, 0);
     #else
-    *c = (uint8_t)Cy_SCB_UART_Get(cy_retarget_io_uart);
+    uint32_t read_value = Cy_SCB_UART_Get(cy_retarget_io_uart);
+    //Wait until the character is received
+    while (CY_SCB_UART_RX_NO_DATA == read_value)
+    {
+        read_value = Cy_SCB_UART_Get(cy_retarget_io_uart);
+    }
+    *c = (uint8_t)read_value;
     return CY_RSLT_SUCCESS;
-    #endif
+    #endif // if defined(COMPONENT_MTB_HAL)
 }
 
 
@@ -199,16 +214,19 @@ static inline cy_rslt_t cy_retarget_io_getchar(char* c)
 //--------------------------------------------------------------------------------------------------
 static inline cy_rslt_t cy_retarget_io_putchar(char c)
 {
-    #if defined(CY_USING_HAL)
+    #if defined(COMPONENT_MTB_HAL)
+    CY_ASSERT(NULL != cy_retarget_io_uart_obj);
+    return mtb_hal_uart_put(cy_retarget_io_uart_obj, (uint8_t)c);
+    #elif defined(CY_USING_HAL)
     return cyhal_uart_putc(&cy_retarget_io_uart_obj, (uint8_t)c);
     #else
-    uint32_t count = 0;
-    while (count == 0)
+    uint32_t count = 0UL;
+    while (count == 0UL)
     {
         count = Cy_SCB_UART_Put(cy_retarget_io_uart, c);
     }
     return CY_RSLT_SUCCESS;
-    #endif
+    #endif //defined(COMPONENT_MTB_HAL)
 }
 
 
@@ -557,7 +575,19 @@ char __attribute__((weak)) *_sys_command_string(char* cmd, int len)
 
 #endif // ARM-MDK
 
-#if defined(CY_USING_HAL)
+#if defined(COMPONENT_MTB_HAL)
+//--------------------------------------------------------------------------------------------------
+// cy_retarget_io_init
+//--------------------------------------------------------------------------------------------------
+cy_rslt_t cy_retarget_io_init(mtb_hal_uart_t* obj)
+{
+    CY_ASSERT(NULL != obj);
+    cy_retarget_io_uart_obj = obj;
+    return cy_retarget_io_mutex_init();
+}
+
+
+#elif defined(CY_USING_HAL)
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_init_fc
 //
@@ -600,7 +630,18 @@ cy_rslt_t cy_retarget_io_init_fc(cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t 
 }
 
 
-#else // if defined(CY_USING_HAL)
+//--------------------------------------------------------------------------------------------------
+// cy_retarget_io_init_hal
+//
+// Initailize retarget-io mutex for thead-safe during initialization
+//--------------------------------------------------------------------------------------------------
+cy_rslt_t cy_retarget_io_init_hal(void)
+{
+    return cy_retarget_io_mutex_init();
+}
+
+
+#else // if defined(COMPONENT_MTB_HAL)
 
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_init
@@ -621,28 +662,18 @@ cy_rslt_t cy_retarget_io_init(CySCB_Type* uart)
 }
 
 
-#endif // defined(CY_USING_HAL)
+#endif // defined(COMPONENT_MTB_HAL)
 
-#if defined(CY_USING_HAL)
-//--------------------------------------------------------------------------------------------------
-// cy_retarget_io_init_hal
-//
-// Initailize retarget-io mutex for thead-safe during initialization
-//--------------------------------------------------------------------------------------------------
-cy_rslt_t cy_retarget_io_init_hal(void)
-{
-    return cy_retarget_io_mutex_init();
-}
-
-
-#endif // defined(CY_USING_HAL)
 
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_is_tx_active
 //--------------------------------------------------------------------------------------------------
 bool cy_retarget_io_is_tx_active(void)
 {
-    #if defined (CY_USING_HAL)
+    #if defined(COMPONENT_MTB_HAL)
+    CY_ASSERT(NULL != cy_retarget_io_uart_obj);
+    return mtb_hal_uart_is_tx_active(cy_retarget_io_uart_obj);
+    #elif defined (CY_USING_HAL)
     return cyhal_uart_is_tx_active(&cy_retarget_io_uart_obj);
     #else
     return !Cy_SCB_IsTxComplete(cy_retarget_io_uart);
@@ -650,7 +681,6 @@ bool cy_retarget_io_is_tx_active(void)
 }
 
 
-#if defined(CY_USING_HAL)
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_deinit
 //--------------------------------------------------------------------------------------------------
@@ -666,16 +696,26 @@ void cy_retarget_io_deinit(void)
         {
             break;
         }
+        #if defined(COMPONENT_MTB_HAL)
+        mtb_hal_system_delay_ms(1);
+        #elif defined(CY_USING_HAL)
         cyhal_system_delay_ms(1);
+        #else
+        Cy_SysLib_Delay(1);
+        #endif //defined(COMPONENT_MTB_HAL)
         timeout_remaining_ms--;
     }
     CY_ASSERT(timeout_remaining_ms != 0);
+    #if defined(COMPONENT_MTB_HAL)
+    cy_retarget_io_uart_obj = NULL;
+    #elif defined(CY_USING_HAL)
     cyhal_uart_free(&cy_retarget_io_uart_obj);
+    #else
+    cy_retarget_io_uart = NULL;
+    #endif //defined(COMPONENT_MTB_HAL)
     cy_retarget_io_mutex_deinit();
 }
 
-
-#endif // if defined(CY_USING_HAL)
 
 #if defined(__cplusplus)
 }

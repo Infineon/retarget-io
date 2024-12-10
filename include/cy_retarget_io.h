@@ -41,31 +41,66 @@
 
 #include <stdio.h>
 #include "cy_result.h"
-#if defined (CY_USING_HAL)
+#if defined(COMPONENT_MTB_HAL)
+#include "mtb_hal_hw_types.h"
+#elif defined(CY_USING_HAL)
 #include "cyhal_hw_types.h"
 #else
 #include "cy_pdl.h"
 #include <stdbool.h>
 #endif
 
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
+#if !defined(COMPONENT_MTB_HAL)
 
 /* Define module errors */
 /** A null pointer was passed as a function parameter. */
 #define CY_RETARGET_IO_RSLT_NULL_UART_PTR    \
     (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_BOARD_LIB_RETARGET_IO, 0))
 
+/** UART baud rate */
+#define CY_RETARGET_IO_BAUDRATE             (115200)
+
 /** UART HAL object used by this library */
 #if defined (CY_USING_HAL)
 extern cyhal_uart_t cy_retarget_io_uart_obj;
 #endif
 
-/** UART baud rate */
-#define CY_RETARGET_IO_BAUDRATE             (115200)
+#endif //!defined(COMPONENT_MTB_HAL)
 
-#if defined(CY_USING_HAL)
+
+#if defined(COMPONENT_MTB_HAL)
+/**
+ * \brief Initialization function for redirecting low level IO commands to allow
+ * sending messages over a UART interface. This will setup the communication
+ * interface to allow using printf and related functions.
+ *
+ * Users of the library must do the following before invoking the init function
+ *     1. Configure the UART using the device configurator generated structures or
+ *        through manually written config structures. Configuration includes the UART TX
+ *        and RX pins, CTS/RTS pins if flow control is desired, Baud Rate and other UART
+ *        config parameters.
+ *     2. Set up the clock source to the UART peripheral. This could be done using the
+ *        device configurator or manually. Set up the clock divider value depending on
+ *        the desired baud rate.
+ *     2. Initialize the UART HW.
+ *     3. Set up the HAL UART object.
+ *     4. Pass the initilialized HAL UART object to the init
+ *
+ * In an RTOS environment, this function must be called after the RTOS has been
+ * initialized.
+ *
+ * \param obj Pointer to the pre-initialized HAL UART object
+ *
+ * \returns CY_RSLT_SUCCESS if successfully initialized, else an error about
+ * what went wrong
+ */
+cy_rslt_t cy_retarget_io_init(mtb_hal_uart_t* obj);
+#elif defined(CY_USING_HAL)
 /**
  * \brief Initialization function for redirecting low level IO commands to allow
  * sending messages over a UART interface. This will setup the communication
@@ -81,20 +116,7 @@ extern cyhal_uart_t cy_retarget_io_uart_obj;
  * what went wrong
  */
 #define cy_retarget_io_init(tx, rx, baudrate) cy_retarget_io_init_fc(tx, rx, NC, NC, baudrate)
-#endif // defined(CY_USING_HAL)
 
-#ifdef DOXYGEN
-
-/** Defining this macro enables conversion of line feed (LF) into carriage
- * return followed by line feed (CR & LF) on the output direction (STDOUT). You
- * can define this macro through the DEFINES variable in the application
- * Makefile.
- */
-#define CY_RETARGET_IO_CONVERT_LF_TO_CRLF
-
-#endif // DOXYGEN
-
-#if defined(CY_USING_HAL)
 /**
  * \brief Initialization function for redirecting low level IO commands to allow
  * sending messages over a UART interface with flow control. This will setup the
@@ -113,9 +135,7 @@ extern cyhal_uart_t cy_retarget_io_uart_obj;
  */
 cy_rslt_t cy_retarget_io_init_fc(cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t cts,
                                  cyhal_gpio_t rts, uint32_t baudrate);
-#endif // defined(CY_USING_HAL)
 
-#if defined(CY_USING_HAL)
 /**
  * \brief Initialization function for redirecting low level IO commands to allow
  * sending messages over a UART interface with a configurator generated configuration
@@ -132,8 +152,7 @@ cy_rslt_t cy_retarget_io_init_fc(cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t 
  * what went wrong
  */
 cy_rslt_t cy_retarget_io_init_hal(void);
-
-#else
+#else // if defined(COMPONENT_MTB_HAL)
 /**
  * \brief Initialization function for redirecting low level IO commands to allow
  * sending messages over a UART interface with a configurator generated configuration
@@ -152,7 +171,18 @@ cy_rslt_t cy_retarget_io_init_hal(void);
  * parameter is a null pointer.
  */
 cy_rslt_t cy_retarget_io_init(CySCB_Type* uart);
-#endif // defined(CY_USING_HAL)
+#endif // defined(COMPONENT_MTB_HAL)
+
+#ifdef DOXYGEN
+
+/** Defining this macro enables conversion of line feed (LF) into carriage
+ * return followed by line feed (CR & LF) on the output direction (STDOUT). You
+ * can define this macro through the DEFINES variable in the application
+ * Makefile.
+ */
+#define CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+
+#endif // DOXYGEN
 
 /**
  * \brief Checks whether there is data waiting to be written to the serial console.
