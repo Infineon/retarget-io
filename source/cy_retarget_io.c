@@ -7,7 +7,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2022 Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2018-2025 Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation
 *
 * SPDX-License-Identifier: Apache-2.0
@@ -129,7 +129,7 @@ static inline cy_rslt_t cy_retarget_io_mutex_init(void)
 }
 
 
-#if defined(__ARMCC_VERSION) // ARM-MDK
+#if defined(__ARMCC_VERSION) || defined(__llvm__) // ARM-MDK or LLVM ARM
 __attribute__((unused))
 #endif
 //--------------------------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ static inline void cy_retarget_io_mutex_acquire(void)
 }
 
 
-#if defined(__ARMCC_VERSION) // ARM-MDK
+#if defined(__ARMCC_VERSION) || defined(__llvm__) // ARM-MDK or LLVM ARM
 __attribute__((unused))
 #endif
 //--------------------------------------------------------------------------------------------------
@@ -151,7 +151,7 @@ static inline void cy_retarget_io_mutex_release(void)
 }
 
 
-#if defined(__ARMCC_VERSION) // ARM-MDK
+#if defined(__ARMCC_VERSION) || defined(__llvm__) // ARM-MDK or LLVM ARM
 __attribute__((unused))
 #endif
 //--------------------------------------------------------------------------------------------------
@@ -231,10 +231,17 @@ static inline cy_rslt_t cy_retarget_io_putchar(char c)
 
 
 #if defined(__ARMCC_VERSION) // ARM-MDK
+#if defined (COMPONENT_MTB_HAL)
+//--------------------------------------------------------------------------------------------------
+// $Sub$$fputc
+//--------------------------------------------------------------------------------------------------
+int $Sub$$fputc(int ch, FILE* f)
+#else
 //--------------------------------------------------------------------------------------------------
 // fputc
 //--------------------------------------------------------------------------------------------------
-int $Sub$$fputc(int ch, FILE* f)
+__attribute__((weak)) int fputc(int ch, FILE* f)
+#endif /* defined(COMPONENT_MTB_HAL) */
 {
     (void)f;
     cy_rslt_t rslt = CY_RSLT_SUCCESS;
@@ -260,6 +267,99 @@ int $Sub$$fputc(int ch, FILE* f)
     return (CY_RSLT_SUCCESS == rslt) ? ch : EOF;
 }
 
+
+#if defined (COMPONENT_MTB_HAL)
+//--------------------------------------------------------------------------------------------------
+// $Sub$$fputc unlocked
+//--------------------------------------------------------------------------------------------------
+int $Sub$$_fputc$unlocked(int ch, FILE* f)
+#else
+//--------------------------------------------------------------------------------------------------
+// _fputc$unlocked
+//--------------------------------------------------------------------------------------------------
+__attribute__((weak)) int _fputc$unlocked(int ch, FILE* f)
+#endif /* defined(COMPONENT_MTB_HAL) */
+{
+    (void)f;
+    cy_rslt_t rslt = CY_RSLT_SUCCESS;
+    #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+    if (((char)ch == '\n') && (cy_retarget_io_stdout_prev_char != '\r'))
+    {
+        rslt = cy_retarget_io_putchar('\r');
+    }
+    #endif // CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+
+
+    if (CY_RSLT_SUCCESS == rslt)
+    {
+        rslt = cy_retarget_io_putchar(ch);
+    }
+
+
+    #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+    if (CY_RSLT_SUCCESS == rslt)
+    {
+        cy_retarget_io_stdout_prev_char = (char)ch;
+    }
+    #endif // CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+
+
+    return (CY_RSLT_SUCCESS == rslt) ? ch : EOF;
+}
+
+
+#elif defined(__llvm__)
+
+//--------------------------------------------------------------------------------------------------
+// uart_putc
+//--------------------------------------------------------------------------------------------------
+static int uart_putc(char c, FILE* file)
+{
+    (void)file;
+    cy_rslt_t rslt = CY_RSLT_SUCCESS;
+    #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+    if (((c == '\n') && (cy_retarget_io_stdout_prev_char != '\r')))
+    {
+        rslt = cy_retarget_io_putchar('\r');
+    }
+    #endif // CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+    if (CY_RSLT_SUCCESS == rslt)
+    {
+        cy_retarget_io_putchar(c);
+    }
+    #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+    if (CY_RSLT_SUCCESS == rslt)
+    {
+        cy_retarget_io_stdout_prev_char = c;
+    }
+    #endif // CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+
+    return (CY_RSLT_SUCCESS == rslt) ? c : EOF;
+}
+
+
+//--------------------------------------------------------------------------------------------------
+// uart_getc
+//--------------------------------------------------------------------------------------------------
+static int uart_getc(FILE* file)
+{
+    (void)file;
+    char c;
+    cy_rslt_t rslt = cy_retarget_io_getchar(&c);
+    return (CY_RSLT_SUCCESS == rslt) ? c : EOF;
+}
+
+
+static FILE __stdio = FDEV_SETUP_STREAM(uart_putc,
+                                        uart_getc,
+                                        NULL,
+                                        _FDEV_SETUP_RW);
+
+FILE* const stdin = &__stdio;
+
+__strong_reference(stdin, stdout);
+
+__strong_reference(stdin, stderr);
 
 #elif defined (__ICCARM__) // IAR
     #include <yfuns.h>
@@ -316,7 +416,7 @@ __asm(".global _printf_float");
 //--------------------------------------------------------------------------------------------------
 // _write
 //--------------------------------------------------------------------------------------------------
-__attribute__((weak)) int32_t _write(int32_t fd, const cy_char8_t* ptr, int32_t len)
+int32_t _write(int32_t fd, const cy_char8_t* ptr, int32_t len)
 {
     int32_t nChars = 0;
     (void)fd;
@@ -358,10 +458,36 @@ __attribute__((weak)) int32_t _write(int32_t fd, const cy_char8_t* ptr, int32_t 
 
 
 #if defined(__ARMCC_VERSION) // ARM-MDK
+#if defined (COMPONENT_MTB_HAL)
+//--------------------------------------------------------------------------------------------------
+// $Sub$$fgetc
+//--------------------------------------------------------------------------------------------------
+int $Sub$$fgetc(FILE* f)
+#else
 //--------------------------------------------------------------------------------------------------
 // fgetc
 //--------------------------------------------------------------------------------------------------
 __attribute__((weak)) int fgetc(FILE* f)
+#endif /* defined(COMPONENT_MTB_HAL) */
+{
+    (void)f;
+    char c;
+    cy_rslt_t rslt = cy_retarget_io_getchar(&c);
+    return (CY_RSLT_SUCCESS == rslt) ? c : EOF;
+}
+
+
+#if defined (COMPONENT_MTB_HAL)
+//--------------------------------------------------------------------------------------------------
+// $Sub$$_fgetc$unlocked
+//--------------------------------------------------------------------------------------------------
+int $Sub$$_fgetc$unlocked(FILE* f)
+#else
+//--------------------------------------------------------------------------------------------------
+// _fgetc$unlocked
+//--------------------------------------------------------------------------------------------------
+__attribute__((weak)) int _fgetc$unlocked(FILE* f)
+#endif /* defined(COMPONENT_MTB_HAL) */
 {
     (void)f;
     char c;
@@ -389,6 +515,9 @@ __weak size_t __read(int handle, unsigned char* buffer, size_t size)
 }
 
 
+#elif defined(__llvm__)
+// Nothing to do, putc/getc all defined in the first #if/#else section.
+
 #else // (__GNUC__)  GCC
 #if !defined(CY_RETARGET_IO_NO_FLOAT)
 // Add an explicit reference to the floating point scanf library to allow the usage of floating
@@ -398,7 +527,7 @@ __asm(".global _scanf_float");
 //--------------------------------------------------------------------------------------------------
 // _read
 //--------------------------------------------------------------------------------------------------
-__attribute__((weak)) int32_t _read(int32_t fd, cy_char8_t* ptr, int32_t len)
+int32_t _read(int32_t fd, cy_char8_t* ptr, int32_t len)
 {
     (void)fd;
 
@@ -575,7 +704,7 @@ char __attribute__((weak)) *_sys_command_string(char* cmd, int len)
 
 #endif // ARM-MDK
 
-#if defined(COMPONENT_MTB_HAL)
+#if defined (COMPONENT_MTB_HAL)
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_init
 //--------------------------------------------------------------------------------------------------
