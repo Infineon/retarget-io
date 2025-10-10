@@ -9,6 +9,8 @@ A utility library to retarget the standard input/output (STDIO) messages to a UA
 * Optional PDL-only support
 
 ### What Changed?
+#### v1.8.1
+* Documentation update
 #### v1.8.0
 * Updated `_read` and `_write` function attributes to support GCC 14.
 #### v1.7.0
