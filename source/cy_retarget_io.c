@@ -2,13 +2,22 @@
 * \file cy_retarget_io.c
 *
 * \brief
-* Provides APIs for retargeting stdio to UART hardware contained on the Cypress
+* Provides APIs for retargeting stdio to UART hardware contained on the Infineon
 * kits.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018-2025 Cypress Semiconductor Corporation (an Infineon company) or
-* an affiliate of Cypress Semiconductor Corporation
+* (c) 2018-2025, Infineon Technologies AG, or an affiliate of Infineon
+* Technologies AG. All rights reserved.
+* This software, associated documentation and materials ("Software") is
+* owned by Infineon Technologies AG or one of its affiliates ("Infineon")
+* and is protected by and subject to worldwide patent protection, worldwide
+* copyright laws, and international treaty provisions. Therefore, you may use
+* this Software only as provided in the license agreement accompanying the
+* software package from which you obtained this Software. If no license
+* agreement applies, then any use, reproduction, modification, translation, or
+* compilation of this Software is prohibited without the express written
+* permission of Infineon.
 *
 * SPDX-License-Identifier: Apache-2.0
 *
@@ -23,6 +32,22 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
+*
+* Disclaimer: UNLESS OTHERWISE EXPRESSLY AGREED WITH INFINEON, THIS SOFTWARE
+* IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+* INCLUDING, BUT NOT LIMITED TO, ALL WARRANTIES OF NON-INFRINGEMENT OF
+* THIRD-PARTY RIGHTS AND IMPLIED WARRANTIES SUCH AS WARRANTIES OF FITNESS FOR A
+* SPECIFIC USE/PURPOSE OR MERCHANTABILITY.
+* Infineon reserves the right to make changes to the Software without notice.
+* You are responsible for properly designing, programming, and testing the
+* functionality and safety of your intended application of the Software, as
+* well as complying with any legal requirements related to its use. Infineon
+* does not guarantee that the Software will be free from intrusion, data theft
+* or loss, or other breaches ("Security Breaches"), and Infineon shall have
+* no liability arising out of any Security Breaches. Unless otherwise
+* explicitly approved by Infineon, the Software may not be used in any
+* application where a failure of the Product or any consequences of the use
+* thereof can reasonably be expected to result in personal injury.
 *******************************************************************************/
 
 #include "cy_retarget_io.h"
@@ -231,17 +256,10 @@ static inline cy_rslt_t cy_retarget_io_putchar(char c)
 
 
 #if defined(__ARMCC_VERSION) // ARM-MDK
-#if defined (COMPONENT_MTB_HAL)
 //--------------------------------------------------------------------------------------------------
-// $Sub$$fputc
+// cy_retarget_io_fputc_common
 //--------------------------------------------------------------------------------------------------
-int $Sub$$fputc(int ch, FILE* f)
-#else
-//--------------------------------------------------------------------------------------------------
-// fputc
-//--------------------------------------------------------------------------------------------------
-__attribute__((weak)) int fputc(int ch, FILE* f)
-#endif /* defined(COMPONENT_MTB_HAL) */
+static inline int cy_retarget_io_fputc_common(int ch, FILE* f)
 {
     (void)f;
     cy_rslt_t rslt = CY_RSLT_SUCCESS;
@@ -270,6 +288,22 @@ __attribute__((weak)) int fputc(int ch, FILE* f)
 
 #if defined (COMPONENT_MTB_HAL)
 //--------------------------------------------------------------------------------------------------
+// $Sub$$fputc
+//--------------------------------------------------------------------------------------------------
+int $Sub$$fputc(int ch, FILE* f)
+#else
+//--------------------------------------------------------------------------------------------------
+// fputc
+//--------------------------------------------------------------------------------------------------
+int fputc(int ch, FILE* f)
+#endif /* defined(COMPONENT_MTB_HAL) */
+{
+    return cy_retarget_io_fputc_common(ch, f);
+}
+
+
+#if defined (COMPONENT_MTB_HAL)
+//--------------------------------------------------------------------------------------------------
 // $Sub$$fputc unlocked
 //--------------------------------------------------------------------------------------------------
 int $Sub$$_fputc$unlocked(int ch, FILE* f)
@@ -277,34 +311,10 @@ int $Sub$$_fputc$unlocked(int ch, FILE* f)
 //--------------------------------------------------------------------------------------------------
 // _fputc$unlocked
 //--------------------------------------------------------------------------------------------------
-__attribute__((weak)) int _fputc$unlocked(int ch, FILE* f)
+int _fputc$unlocked(int ch, FILE* f)
 #endif /* defined(COMPONENT_MTB_HAL) */
 {
-    (void)f;
-    cy_rslt_t rslt = CY_RSLT_SUCCESS;
-    #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
-    if (((char)ch == '\n') && (cy_retarget_io_stdout_prev_char != '\r'))
-    {
-        rslt = cy_retarget_io_putchar('\r');
-    }
-    #endif // CY_RETARGET_IO_CONVERT_LF_TO_CRLF
-
-
-    if (CY_RSLT_SUCCESS == rslt)
-    {
-        rslt = cy_retarget_io_putchar(ch);
-    }
-
-
-    #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
-    if (CY_RSLT_SUCCESS == rslt)
-    {
-        cy_retarget_io_stdout_prev_char = (char)ch;
-    }
-    #endif // CY_RETARGET_IO_CONVERT_LF_TO_CRLF
-
-
-    return (CY_RSLT_SUCCESS == rslt) ? ch : EOF;
+    return cy_retarget_io_fputc_common(ch, f);
 }
 
 
@@ -367,7 +377,7 @@ __strong_reference(stdin, stderr);
 //--------------------------------------------------------------------------------------------------
 // __write
 //--------------------------------------------------------------------------------------------------
-__weak size_t __write(int handle, const unsigned char* buffer, size_t size)
+size_t __write(int handle, const unsigned char* buffer, size_t size)
 {
     size_t nChars = 0;
     // This template only writes to "standard out", for all other file handles it returns failure.
@@ -467,7 +477,7 @@ int $Sub$$fgetc(FILE* f)
 //--------------------------------------------------------------------------------------------------
 // fgetc
 //--------------------------------------------------------------------------------------------------
-__attribute__((weak)) int fgetc(FILE* f)
+int fgetc(FILE* f)
 #endif /* defined(COMPONENT_MTB_HAL) */
 {
     (void)f;
@@ -486,7 +496,7 @@ int $Sub$$_fgetc$unlocked(FILE* f)
 //--------------------------------------------------------------------------------------------------
 // _fgetc$unlocked
 //--------------------------------------------------------------------------------------------------
-__attribute__((weak)) int _fgetc$unlocked(FILE* f)
+int _fgetc$unlocked(FILE* f)
 #endif /* defined(COMPONENT_MTB_HAL) */
 {
     (void)f;
@@ -500,7 +510,7 @@ __attribute__((weak)) int _fgetc$unlocked(FILE* f)
 //--------------------------------------------------------------------------------------------------
 // __read
 //--------------------------------------------------------------------------------------------------
-__weak size_t __read(int handle, unsigned char* buffer, size_t size)
+size_t __read(int handle, unsigned char* buffer, size_t size)
 {
     // This template only reads from "standard in", for all other file handles it returns failure.
     if ((handle != _LLIO_STDIN) || (buffer == NULL))
@@ -716,7 +726,7 @@ cy_rslt_t cy_retarget_io_init(mtb_hal_uart_t* obj)
 }
 
 
-#elif defined(CY_USING_HAL)
+#elif (defined(CY_USING_HAL) || defined(DOXYGEN))
 //--------------------------------------------------------------------------------------------------
 // cy_retarget_io_init_fc
 //
@@ -845,6 +855,28 @@ void cy_retarget_io_deinit(void)
     cy_retarget_io_mutex_deinit();
 }
 
+
+#if defined(COMPONENT_MTB_HAL) || defined(DOXYGEN)
+//--------------------------------------------------------------------------------------------------
+// cy_retarget_io_change_baud_rate
+//--------------------------------------------------------------------------------------------------
+cy_rslt_t cy_retarget_io_change_baud_rate(uint32_t baud_rate, uint32_t* actual_baud)
+{
+    if (cy_retarget_io_uart_obj == NULL)
+    {
+        return CY_RSLT_TYPE_ERROR;
+    }
+
+    while (cy_retarget_io_is_tx_active() == true)
+    {
+        // Wait for transmission to complete
+    }
+
+    return (mtb_hal_uart_set_baud(cy_retarget_io_uart_obj, baud_rate, actual_baud));
+}
+
+
+#endif // defined(COMPONENT_MTB_HAL) || defined(DOXYGEN)
 
 #if defined(__cplusplus)
 }

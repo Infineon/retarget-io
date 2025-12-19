@@ -14,8 +14,17 @@
  *
  ***************************************************************************************************
  * \copyright
- * Copyright 2018-2025 Cypress Semiconductor Corporation (an Infineon company) or
- * an affiliate of Cypress Semiconductor Corporation
+ * (c) 2018-2025, Infineon Technologies AG, or an affiliate of Infineon
+ * Technologies AG. All rights reserved.
+ * This software, associated documentation and materials ("Software") is
+ * owned by Infineon Technologies AG or one of its affiliates ("Infineon")
+ * and is protected by and subject to worldwide patent protection, worldwide
+ * copyright laws, and international treaty provisions. Therefore, you may use
+ * this Software only as provided in the license agreement accompanying the
+ * software package from which you obtained this Software. If no license
+ * agreement applies, then any use, reproduction, modification, translation, or
+ * compilation of this Software is prohibited without the express written
+ * permission of Infineon.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -30,6 +39,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Disclaimer: UNLESS OTHERWISE EXPRESSLY AGREED WITH INFINEON, THIS SOFTWARE
+ * IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING, BUT NOT LIMITED TO, ALL WARRANTIES OF NON-INFRINGEMENT OF
+ * THIRD-PARTY RIGHTS AND IMPLIED WARRANTIES SUCH AS WARRANTIES OF FITNESS FOR A
+ * SPECIFIC USE/PURPOSE OR MERCHANTABILITY.
+ * Infineon reserves the right to make changes to the Software without notice.
+ * You are responsible for properly designing, programming, and testing the
+ * functionality and safety of your intended application of the Software, as
+ * well as complying with any legal requirements related to its use. Infineon
+ * does not guarantee that the Software will be free from intrusion, data theft
+ * or loss, or other breaches ("Security Breaches"), and Infineon shall have
+ * no liability arising out of any Security Breaches. Unless otherwise
+ * explicitly approved by Infineon, the Software may not be used in any
+ * application where a failure of the Product or any consequences of the use
+ * thereof can reasonably be expected to result in personal injury.
  **************************************************************************************************/
 
 /**
@@ -94,13 +119,16 @@ extern cyhal_uart_t cy_retarget_io_uart_obj;
  * In an RTOS environment, this function must be called after the RTOS has been
  * initialized.
  *
+ * \note The quantity and type of arguments for this function vary based on the configuration used.
+ * See the \ref init_function_reference "Initialization Function Reference" section for details.
+ *
  * \param obj Pointer to the pre-initialized HAL UART object
  *
  * \returns CY_RSLT_SUCCESS if successfully initialized, else an error about
  * what went wrong
  */
 cy_rslt_t cy_retarget_io_init(mtb_hal_uart_t* obj);
-#elif defined(CY_USING_HAL)
+#elif (defined(CY_USING_HAL) || defined(DOXYGEN))
 /**
  * \brief Initialization function for redirecting low level IO commands to allow
  * sending messages over a UART interface. This will setup the communication
@@ -108,6 +136,11 @@ cy_rslt_t cy_retarget_io_init(mtb_hal_uart_t* obj);
  *
  * In an RTOS environment, this function must be called after the RTOS has been
  * initialized.
+ *
+ * \note The quantity and type of arguments for this function vary based on the configuration used.
+ * See the \ref init_function_reference "Initialization Function Reference" section for details.
+ * \note This is a macro that calls cy_retarget_io_init_fc() with NC values for flow control pins in
+ * CY_USING_HAL mode.
  *
  * \param tx UART TX pin, if no TX pin use NC
  * \param rx UART RX pin, if no RX pin use NC
@@ -124,6 +157,10 @@ cy_rslt_t cy_retarget_io_init(mtb_hal_uart_t* obj);
  *
  * In an RTOS environment, this function must be called after the RTOS has been
  * initialized.
+ *
+ * \note The quantity and type of arguments for this function vary based on the configuration used.
+ * See the \ref init_function_reference "Initialization Function Reference" section for details.
+ * \note This function provides full control including flow control pins (CTS/RTS).
  *
  * \param tx UART TX pin, if no TX pin use NC
  * \param rx UART RX pin, if no RX pin use NC
@@ -148,6 +185,10 @@ cy_rslt_t cy_retarget_io_init_fc(cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t 
  * In an RTOS environment, this function must be called after the RTOS has been
  * initialized.
  *
+ * \note The quantity and type of arguments for this function vary based on the configuration used.
+ * See the \ref init_function_reference "Initialization Function Reference" section for details.
+ * \note Requires cy_retarget_io_uart_obj to be pre-initialized before calling this function.
+ *
  * \returns CY_RSLT_SUCCESS if successfully initialized, else an error about
  * what went wrong
  */
@@ -164,6 +205,10 @@ cy_rslt_t cy_retarget_io_init_hal(void);
  *
  * When not using the HAL, retarget-io is not thread safe.  Consider using printf
  * from a single thread or using a mutex to protect the printf calls.
+ *
+ * \note This function is only available when neither COMPONENT_MTB_HAL nor CY_USING_HAL
+ *       is defined (PDL-only mode).
+ * \note This mode is not thread-safe and requires manual concurrency management.
  *
  * \param uart Pointer to UART object, usually named and defined in device-configurator.
  *
@@ -195,6 +240,35 @@ bool cy_retarget_io_is_tx_active(void);
  * After calling this, printf and related functions will no longer work.
  */
 void cy_retarget_io_deinit(void);
+
+#if defined(COMPONENT_MTB_HAL) || defined(DOXYGEN)
+/**
+ * \brief Changes the UART baud rate for the retarget-io interface.
+ *
+ * This function allows dynamic baud rate changes during runtime using the MTB-HAL framework.
+ * It operates on the UART object that was previously initialized with cy_retarget_io_init(),
+ * so no UART object parameter is needed.
+ *
+ * The function uses the MTB-HAL baud rate setting capability to automatically determine
+ * and configure the optimal peripheral clock divider and oversample values required
+ * to achieve the target baud rate with minimal error. This leverages the HAL's built-in
+ * expertise for accurate baud rate configuration across different hardware platforms.
+ *
+ * \note This function requires COMPONENT_MTB_HAL to be defined. It is not available
+ *       when using CY-HAL or PDL-only configurations.
+ * \note Changing the baud rate will cause a brief communication interruption.
+ * \note The terminal/host must also be set to the new baud rate to maintain communication.
+ * \note For production environments, consider using a separate debug UART with a fixed baud rate.
+ *
+ * \param baud_rate Desired baud rate (e.g., 9600, 115200, 230400)
+ * \param actual_baud Pointer to store the actual baud rate achieved by the hardware,
+ *                    or NULL if the actual baud rate is not needed
+ *
+ * \returns CY_RSLT_SUCCESS if successfully changed, else an error about
+ * what went wrong
+ */
+cy_rslt_t cy_retarget_io_change_baud_rate(uint32_t baud_rate, uint32_t* actual_baud);
+#endif // defined(COMPONENT_MTB_HAL) || defined(DOXYGEN)
 
 #if defined(__cplusplus)
 }

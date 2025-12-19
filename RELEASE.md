@@ -9,6 +9,9 @@ A utility library to retarget the standard input/output (STDIO) messages to a UA
 * Optional PDL-only support
 
 ### What Changed?
+#### v1.9.0
+* Added `cy_retarget_io_change_baud_rate` function.
+* Refactored duplicate code in `fputc` and `_fputc$unlocked` to use a common helper function.
 #### v1.8.1
 * Documentation update
 #### v1.8.0
@@ -48,10 +51,10 @@ This version of the Retarget IO was validated for compatibility with the followi
 
 | Software and Tools                        | Version |
 | :---                                      | :----:  |
-| ModusToolbox™ Software Environment        | 3.5.0   |
+| ModusToolbox™ Software Environment        | 3.6.0   |
 | GCC Compiler                              | 14.2.1  |
-| IAR Compiler                              | 9.40.2  |
-| ARM Compiler 6                            | 6.16    |
+| IAR Compiler                              | 9.50.2  |
+| ARM Compiler 6                            | 6.22    |
 
 Minimum required ModusToolbox™ Software Environment: v3.5.0
 
@@ -65,4 +68,4 @@ Minimum required ModusToolbox™ Software Environment: v3.5.0
 * [ModusToolbox™ Software](https://github.com/Infineon/modustoolbox-software)
 
 ---
-© Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2025.
+© Copyright 2018-2025 Infineon Technologies Apache2

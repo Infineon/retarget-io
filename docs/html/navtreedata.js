@@ -25,6 +25,30 @@
 var NAVTREE =
 [
   [ "Retarget IO", "index.html", [
+    [ "Initialization Function Reference", "index.html#init_function_reference", [
+      [ "Overview", "index.html#autotoc_md1", null ],
+      [ "Buffer Flushing Behavior by Compiler", "index.html#autotoc_md2", null ],
+      [ "Manual Buffer Flushing Methods", "index.html#autotoc_md3", null ],
+      [ "Important Notes", "index.html#autotoc_md4", null ],
+      [ "RTOS Integration", "index.html#autotoc_md5", null ],
+      [ "Quick Start (with MTB-HAL(COMPONENT_MTB_HAL) Support)", "index.html#autotoc_md6", null ],
+      [ "Quick Start (with CY-HAL(CY_USING_HAL) Support)", "index.html#autotoc_md7", null ],
+      [ "Quick Start (PDL Only)", "index.html#autotoc_md8", null ],
+      [ "Dynamic Baud Rate Change (MTB-HAL Only)", "index.html#autotoc_md9", [
+        [ "Parameters:", "index.html#autotoc_md10", null ],
+        [ "Prerequisites:", "index.html#autotoc_md11", null ],
+        [ "Features:", "index.html#autotoc_md12", null ],
+        [ "Example Usage:", "index.html#autotoc_md13", null ],
+        [ "Important Notes:", "index.html#autotoc_md14", null ]
+      ] ],
+      [ "Enabling Conversion of '\\n' into \"\\r\\n\"", "index.html#autotoc_md15", [
+        [ "Line Ending Conventions", "index.html#autotoc_md16", null ],
+        [ "In UART Terminal Context", "index.html#autotoc_md17", null ],
+        [ "Automatic Conversion Feature", "index.html#autotoc_md18", null ]
+      ] ],
+      [ "Floating Point Support", "index.html#autotoc_md19", null ],
+      [ "More information", "index.html#autotoc_md20", null ]
+    ] ],
     [ "API Reference", "modules.html", "modules" ]
   ] ]
 ];

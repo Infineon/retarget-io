@@ -89,16 +89,57 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="textblock"><p ><a class="anchor" id="md_output_README_doxygen"></a> </p>
 <h2><a class="anchor" id="autotoc_md1"></a>
 Overview</h2>
-<p >A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using <code>printf()</code>. You can specify the TX pin, RX pin, and the baud rate when configuring the UART.</p>
-<p ><b>NOTE:</b> The standard library is not standard in how it treats an I/O stream. Some implement a data buffer by default. The buffer is not flushed until it is full. In that case it may appear that your I/O is not working. You should be aware of how the library buffers data, and you should identify a buffering strategy and buffer size for a specified stream. If you supply a buffer, it must exist until the stream is closed. The following line of code disables the buffer for the standard library that accompanies the GCC compiler: </p><pre class="fragment">setvbuf( stdin, NULL, _IONBF, 0 );
-</pre><p> <b>NOTE:</b> If the application is built using newlib-nano, by default, floating point format strings (f) are not supported. To enable this support, you must add <code>-u _printf_float</code> to the linker command line.</p>
-<p ><b>NOTE:</b> In general, console prints such as printf() should not be performed in ISR context. It must definitely not be called in ISR context when <code>CY_RTOS_AWARE</code> is defined, as the threat safety implementation disallows such calls.</p>
-<p >NOTE: If the application is built without HAL support (i.e., neither <code>COMPONENT_MTB_HAL</code> nor <code>CY_USING_HAL</code> is defined), then the UART must be initialized using PDL function calls prior to being passed into the <code><a class="el" href="group__group__board__libs.html#ga4905a76eaea9b40111887f5b6ff7d252" title="UART HAL object used by this library.">cy_retarget_io_init()</a></code> function. See <em>Quick Start (PDL Only)</em> section below.</p>
+<p >A utility library to retarget the standard input/output (STDIO) messages to a UART port. With this library, you can directly print messages on a UART terminal using <code>printf()</code>. You can specify the TX pin, RX pin, and the baud rate when configuring the UART. When using MTB-HAL, the library also provides functionality to dynamically change the UART baud rate at runtime.</p>
+<p ><b>NOTE:</b> The standard library is not standard in how it treats an I/O stream. Some implement a data buffer by default. The buffer is not flushed until it is full. In that case it may appear that your I/O is not working. You should be aware of how the library buffers data, and you should identify a buffering strategy and buffer size for a specified stream. If you supply a buffer, it must exist until the stream is closed.</p>
+<p ><b>Buffer Configuration:</b> The default buffer size is typically defined by the <code>BUFSIZ</code> constant in <code>&lt;stdio.h&gt;</code>, which varies by compiler (usually 512-1024 bytes for embedded systems). This buffer is managed by the C standard library implementation that comes with your compiler (GCC_ARM/LLVM, ARM, IAR etc.). The retarget-io library works independently of these buffers by implementing low-level I/O redirection, but standard library buffering still applies unless explicitly disabled with <code>setvbuf()</code>.</p>
 <h2><a class="anchor" id="autotoc_md2"></a>
+Buffer Flushing Behavior by Compiler</h2>
+<p ><b>GCC_ARM, LLVM and ARM Compilers:</b> These compilers support automatic buffer flushing control. You can disable buffering entirely: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
+<div class="line">setvbuf(stdin, NULL, _IONBF, 0);   <span class="comment">// Disable input buffering</span></div>
+<div class="line">setvbuf(stdout, NULL, _IONBF, 0);  <span class="comment">// Disable output buffering</span></div>
+</div><!-- fragment --><p ><b>IAR Compiler:</b> IAR has limited standard library support in embedded projects. Buffer flushing must be handled manually:</p><ul>
+<li><b>Automatic flush:</b> End printf strings with <code>\n</code> (newline character)</li>
+<li><b>Manual flush:</b> Call <code>fflush(stdout)</code> if available, or use newline characters</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md3"></a>
+Manual Buffer Flushing Methods</h2>
+<p >If automatic buffer disabling is not available, use these approaches:</p>
+<ol type="1">
+<li><b>Always use newline characters (most portable):</b> <div class="fragment"><div class="line">printf(<span class="stringliteral">&quot;Hello World\n&quot;</span>);  <span class="comment">// Flushes immediately on most systems</span></div>
+</div><!-- fragment --></li>
+<li><b>Manual flush with fflush() (if supported):</b> <div class="fragment"><div class="line">printf(<span class="stringliteral">&quot;Hello World&quot;</span>);</div>
+<div class="line">fflush(stdout);  <span class="comment">// Force immediate output</span></div>
+</div><!-- fragment --></li>
+</ol>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Important Notes</h2>
+<p ><b>Floating Point Support:</b> If the application is built using newlib-nano, by default, floating point format strings (f) are not supported. To enable this support, you must add <code>-u _printf_float</code> to the linker command line.</p>
+<p ><b>ISR Context:</b> In general, console prints such as printf() should not be performed in ISR context. It must definitely not be called in ISR context when <code>CY_RTOS_AWARE</code> is defined, as the thread safety implementation disallows such calls.</p>
+<p ><b>PDL-Only Mode:</b> If the application is built without HAL support (i.e., neither <code>COMPONENT_MTB_HAL</code> nor <code>CY_USING_HAL</code> is defined), then the UART must be initialized using PDL function calls prior to being passed into the <code><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="UART HAL object used by this library.">cy_retarget_io_init()</a></code> function. See <em>Quick Start (PDL Only)</em> section below.</p>
+<h2><a class="anchor" id="autotoc_md5"></a>
 RTOS Integration</h2>
 <p >To avoid concurrent access to the UART peripheral in a RTOS environment, the ARM and IAR libraries use mutexes to control access to stdio streams. For Newlib (GCC_ARM), the mutex must be implemented in _write() and can be enabled by adding <code>DEFINES+=CY_RTOS_AWARE</code> to the Makefile. For all libraries, the program must start the RTOS kernel before calling any stdio functions.</p>
 <p >HAL support is required for retarget-io in an RTOS environment. If your project does not include HAL support, you must manually manage concurrency in your application.</p>
-<h2><a class="anchor" id="autotoc_md3"></a>
+<h1><a class="anchor" id="init_function_reference"></a>
+Initialization Function Reference</h1>
+<p >The retarget-io library provides different initialization functions based on your project configuration:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Configuration   </th><th class="markdownTableHeadNone">Function   </th><th class="markdownTableHeadNone">Parameters   </th><th class="markdownTableHeadNone">Notes    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><b>MTB-HAL</b> (<code>COMPONENT_MTB_HAL</code>)   </td><td class="markdownTableBodyNone"><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="UART HAL object used by this library.">cy_retarget_io_init()</a>   </td><td class="markdownTableBodyNone">1 arg: MTB-HAL UART object pointer   </td><td class="markdownTableBodyNone">Requires pre-configured UART    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"></td><td class="markdownTableBodyNone"><a class="el" href="group__group__board__libs.html#ga6d4f4d59e2291142c5518d70fe8cb437" title="Changes the UART baud rate for the retarget-io interface.">cy_retarget_io_change_baud_rate()</a>   </td><td class="markdownTableBodyNone">2 args: baud rate, actual baud pointer   </td><td class="markdownTableBodyNone">Changes UART baud rate dynamically on retarget-io UART    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><b>CY-HAL</b> (<code>CY_USING_HAL</code>)   </td><td class="markdownTableBodyNone"><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="UART HAL object used by this library.">cy_retarget_io_init()</a>   </td><td class="markdownTableBodyNone">3 args: TX pin, RX pin, baud rate   </td><td class="markdownTableBodyNone">Macro calling <a class="el" href="group__group__board__libs.html#gacb7b45b0b8f0aef59b790415c14496a8" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init_fc()</a>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"></td><td class="markdownTableBodyNone"><a class="el" href="group__group__board__libs.html#gacb7b45b0b8f0aef59b790415c14496a8" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init_fc()</a>   </td><td class="markdownTableBodyNone">5 args: pins + flow control   </td><td class="markdownTableBodyNone">Full control with CTS/RTS    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"></td><td class="markdownTableBodyNone"><a class="el" href="group__group__board__libs.html#gabcaacea7d2ca44d20b4e224b45932245" title="Initialization function for redirecting low level IO commands to allow sending messages over a UART i...">cy_retarget_io_init_hal()</a>   </td><td class="markdownTableBodyNone">0 args   </td><td class="markdownTableBodyNone">Assumes <code>cy_retarget_io_uart_obj</code> pre-initialized    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><b>PDL-Only</b> (no HAL)   </td><td class="markdownTableBodyNone"><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="UART HAL object used by this library.">cy_retarget_io_init()</a>   </td><td class="markdownTableBodyNone">1 arg: SCB UART peripheral pointer   </td><td class="markdownTableBodyNone">Not thread-safe   </td></tr>
+</table>
+<h2><a class="anchor" id="autotoc_md6"></a>
 Quick Start (with MTB-HAL(COMPONENT_MTB_HAL) Support)</h2>
 <ol type="1">
 <li>Configure the UART using the device configurator generated structures or through manually written config structures. Configuration includes the UART TX and RX pins, CTS/RTS pins if flow control is desired, Baud Rate and other UART config parameters</li>
@@ -114,20 +155,37 @@ Quick Start (with MTB-HAL(COMPONENT_MTB_HAL) Support)</h2>
 <li>Enable the UART peripheral <div class="fragment"><div class="line">Cy_SCB_UART_Enable(DEBUG_UART_HW);</div>
 </div><!-- fragment --></li>
 <li>Add #<code>include "cy_retarget_io.h"</code>.</li>
-<li>Call <code>cy_retarget_io_init(&amp;DEBUG_UART_hal_obj);</code>.</li>
+<li>Call <code><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="UART HAL object used by this library.">cy_retarget_io_init(&amp;DEBUG_UART_hal_obj)</a>;</code>.</li>
 <li>Start printing using <code>printf()</code>.</li>
+<li><b>Optional:</b> Change UART baud rate dynamically using <code><a class="el" href="group__group__board__libs.html#ga6d4f4d59e2291142c5518d70fe8cb437" title="Changes the UART baud rate for the retarget-io interface.">cy_retarget_io_change_baud_rate()</a></code>: <div class="fragment"><div class="line">uint32_t actual_baud = 0;</div>
+<div class="line">cy_rslt_t result = <a class="code hl_function" href="group__group__board__libs.html#ga6d4f4d59e2291142c5518d70fe8cb437">cy_retarget_io_change_baud_rate</a>(9600, &amp;actual_baud);</div>
+<div class="line"><span class="keywordflow">if</span> (result == CY_RSLT_SUCCESS) {</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Baud rate changed to %lu\n&quot;</span>, actual_baud);</div>
+<div class="line">}</div>
+<div class="ttc" id="agroup__group__board__libs_html_ga6d4f4d59e2291142c5518d70fe8cb437"><div class="ttname"><a href="group__group__board__libs.html#ga6d4f4d59e2291142c5518d70fe8cb437">cy_retarget_io_change_baud_rate</a></div><div class="ttdeci">cy_rslt_t cy_retarget_io_change_baud_rate(uint32_t baud_rate, uint32_t *actual_baud)</div><div class="ttdoc">Changes the UART baud rate for the retarget-io interface.</div><div class="ttdef"><b>Definition:</b> cy_retarget_io.c:863</div></div>
+</div><!-- fragment --> <b>Note:</b> This function uses the MTB-HAL baud rate setting capability to automatically configure optimal peripheral clock divider and oversample values for accurate baud rates.</li>
 <li>If needed, register a callback to handle the transitions to deepsleep (it's automatically registered in CY-HAL case). This can be done by registering with <code>Cy_SysPm_RegisterCallback</code> either the predefined mtb_syspm_scb_uart_deepsleep_callback from the syspm-callbacks asset or a new callback function specific to the needs of the user. For more info refer to <code>Cy_SysPm_RegisterCallback</code> in PDL documentation.</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 Quick Start (with CY-HAL(CY_USING_HAL) Support)</h2>
 <ol type="1">
 <li>Add #<code>include "cy_retarget_io.h"</code></li>
-<li><p class="startli">Call <code>cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);</code></p>
-<p class="startli"><code>CYBSP_DEBUG_UART_TX</code> and <code>CYBSP_DEBUG_UART_RX</code> pins are defined in the BSP and <code>CY_RETARGET_IO_BAUDRATE</code> is set to 115200. You can use a different baud rate if you prefer.</p>
+<li><p class="startli">Choose one of the initialization options:</p>
+<p class="startli"><b>Basic initialization (3 parameters):</b> </p><div class="fragment"><div class="line"><a class="code hl_define" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707">cy_retarget_io_init</a>(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, <a class="code hl_define" href="group__group__board__libs.html#gabb0b30d1e6a6c7e301b2b74450be762d">CY_RETARGET_IO_BAUDRATE</a>);</div>
+<div class="ttc" id="agroup__group__board__libs_html_gabb0b30d1e6a6c7e301b2b74450be762d"><div class="ttname"><a href="group__group__board__libs.html#gabb0b30d1e6a6c7e301b2b74450be762d">CY_RETARGET_IO_BAUDRATE</a></div><div class="ttdeci">#define CY_RETARGET_IO_BAUDRATE</div><div class="ttdoc">UART baud rate.</div><div class="ttdef"><b>Definition:</b> cy_retarget_io.h:91</div></div>
+<div class="ttc" id="agroup__group__board__libs_html_gaddff65f18135a8491811ee3886e69707"><div class="ttname"><a href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707">cy_retarget_io_init</a></div><div class="ttdeci">#define cy_retarget_io_init(tx, rx, baudrate)</div><div class="ttdoc">UART HAL object used by this library.</div><div class="ttdef"><b>Definition:</b> cy_retarget_io.h:151</div></div>
+</div><!-- fragment --><p class="startli"><b>With flow control (5 parameters):</b> </p><div class="fragment"><div class="line"><a class="code hl_function" href="group__group__board__libs.html#gacb7b45b0b8f0aef59b790415c14496a8">cy_retarget_io_init_fc</a>(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, </div>
+<div class="line">                      CYBSP_DEBUG_UART_CTS, CYBSP_DEBUG_UART_RTS, </div>
+<div class="line">                      <a class="code hl_define" href="group__group__board__libs.html#gabb0b30d1e6a6c7e301b2b74450be762d">CY_RETARGET_IO_BAUDRATE</a>);</div>
+<div class="ttc" id="agroup__group__board__libs_html_gacb7b45b0b8f0aef59b790415c14496a8"><div class="ttname"><a href="group__group__board__libs.html#gacb7b45b0b8f0aef59b790415c14496a8">cy_retarget_io_init_fc</a></div><div class="ttdeci">cy_rslt_t cy_retarget_io_init_fc(cyhal_gpio_t tx, cyhal_gpio_t rx, cyhal_gpio_t cts, cyhal_gpio_t rts, uint32_t baudrate)</div><div class="ttdoc">Initialization function for redirecting low level IO commands to allow sending messages over a UART i...</div><div class="ttdef"><b>Definition:</b> cy_retarget_io.c:735</div></div>
+</div><!-- fragment --><p class="startli"><b>Pre-initialized UART object (0 parameters):</b> </p><div class="fragment"><div class="line"><span class="comment">// First initialize cy_retarget_io_uart_obj separately, then:</span></div>
+<div class="line"><a class="code hl_function" href="group__group__board__libs.html#gabcaacea7d2ca44d20b4e224b45932245">cy_retarget_io_init_hal</a>();</div>
+<div class="ttc" id="agroup__group__board__libs_html_gabcaacea7d2ca44d20b4e224b45932245"><div class="ttname"><a href="group__group__board__libs.html#gabcaacea7d2ca44d20b4e224b45932245">cy_retarget_io_init_hal</a></div><div class="ttdeci">cy_rslt_t cy_retarget_io_init_hal(void)</div><div class="ttdoc">Initialization function for redirecting low level IO commands to allow sending messages over a UART i...</div><div class="ttdef"><b>Definition:</b> cy_retarget_io.c:777</div></div>
+</div><!-- fragment --><p class="startli"><code>CYBSP_DEBUG_UART_TX</code> and <code>CYBSP_DEBUG_UART_RX</code> pins are defined in the BSP and <code>CY_RETARGET_IO_BAUDRATE</code> is set to 115200. You can use a different baud rate if you prefer.</p>
 </li>
 <li>Start printing using <code>printf()</code></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md8"></a>
 Quick Start (PDL Only)</h2>
 <p >These instructions apply when the UART interface is provided by the SCB peripheral directly using a PDL configured and initialized SCB object. Only relevant when HAL is unavailable. UART interfaces other than SCB are not supported at this time.</p>
 <ol type="1">
@@ -135,16 +193,101 @@ Quick Start (PDL Only)</h2>
 <li>Initialize and enable your UART hardware using PDL function calls. The DEBUG_UART must be defined and configured in the Device Configurator tool. <div class="fragment"><div class="line">Cy_SCB_UART_Init(DEBUG_UART_HW, &amp;DEBUG_UART_config, NULL);</div>
 <div class="line">Cy_SCB_UART_Enable(DEBUG_UART_HW);</div>
 </div><!-- fragment --></li>
-<li>Call <code>cy_retarget_io_init(DEBUG_UART_HW);</code></li>
+<li>Call <code><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="UART HAL object used by this library.">cy_retarget_io_init(DEBUG_UART_HW)</a>;</code></li>
 <li>Start printing using <code>printf()</code></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md6"></a>
+<h2><a class="anchor" id="autotoc_md9"></a>
+Dynamic Baud Rate Change (MTB-HAL Only)</h2>
+<p >The retarget-io library provides a function to dynamically change the UART baud rate at runtime when using MTB-HAL configuration:</p>
+<div class="fragment"><div class="line">cy_rslt_t <a class="code hl_function" href="group__group__board__libs.html#ga6d4f4d59e2291142c5518d70fe8cb437">cy_retarget_io_change_baud_rate</a>(uint32_t baud_rate, uint32_t* actual_baud);</div>
+</div><!-- fragment --><p >This function operates on the UART object that was initialized with <code><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="UART HAL object used by this library.">cy_retarget_io_init()</a></code>, so no UART object parameter is needed.</p>
+<h3><a class="anchor" id="autotoc_md10"></a>
+Parameters:</h3>
+<ul>
+<li><code>baud_rate</code>: Desired baud rate (e.g., 9600, 115200, 230400)</li>
+<li><code>actual_baud</code>: Pointer to store the actual baud rate achieved</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md11"></a>
+Prerequisites:</h3>
+<ul>
+<li>The retarget-io library must be initialized with <code><a class="el" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707" title="UART HAL object used by this library.">cy_retarget_io_init()</a></code> before calling this function</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md12"></a>
+Features:</h3>
+<ul>
+<li><b>MTB-HAL Integration</b>: Uses <code>mtb_hal_uart_set_baud()</code> to leverage HAL's built-in baud rate configuration expertise</li>
+<li><b>Automatic Configuration</b>: HAL automatically determines optimal peripheral clock divider and oversample values</li>
+<li><b>Cross-Platform Compatibility</b>: Works consistently across different MTB-HAL supported hardware platforms</li>
+<li><b>Communication Safety</b>: Includes proper UART buffer flushing before baud rate changes</li>
+<li><b>Error Handling</b>: Returns appropriate error codes if baud rate cannot be achieved</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md13"></a>
+Example Usage:</h3>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;cy_retarget_io.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Initialize retarget-io first</span></div>
+<div class="line"><a class="code hl_define" href="group__group__board__libs.html#gaddff65f18135a8491811ee3886e69707">cy_retarget_io_init</a>(&amp;DEBUG_UART_hal_obj);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Change to different baud rates as needed</span></div>
+<div class="line">uint32_t actual_baud = 0;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Change to 9600 baud</span></div>
+<div class="line">cy_rslt_t result = <a class="code hl_function" href="group__group__board__libs.html#ga6d4f4d59e2291142c5518d70fe8cb437">cy_retarget_io_change_baud_rate</a>(9600, &amp;actual_baud);</div>
+<div class="line"><span class="keywordflow">if</span> (result == CY_RSLT_SUCCESS) {</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Successfully changed to %lu baud\n&quot;</span>, actual_baud);</div>
+<div class="line">} <span class="keywordflow">else</span> {</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Failed to change baud rate\n&quot;</span>);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Change back to 115200 baud</span></div>
+<div class="line">result = <a class="code hl_function" href="group__group__board__libs.html#ga6d4f4d59e2291142c5518d70fe8cb437">cy_retarget_io_change_baud_rate</a>(115200, &amp;actual_baud);</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md14"></a>
+Important Notes:</h3>
+<ul>
+<li>This function is <b>only available when <code>COMPONENT_MTB_HAL</code> is defined</b></li>
+<li>Changing the baud rate will cause temporary communication disruption</li>
+<li>The terminal/host must also be set to the new baud rate to maintain communication</li>
+<li>For production use, consider using a separate debug UART that maintains a fixed baud rate</li>
+<li>The function uses MTB-HAL's <code>mtb_hal_uart_set_baud()</code> for reliable cross-platform baud rate configuration</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md15"></a>
 Enabling Conversion of '\n' into "\r\n"</h2>
-<p >If you want to use only '\n' instead of "\r\n" for printing a new line using printf(), define the macro <code>CY_RETARGET_IO_CONVERT_LF_TO_CRLF</code> using the <em>DEFINES</em> variable in the application Makefile. The library will then append '\r' before '\n' character on the output direction (STDOUT). No conversion occurs if "\r\n" is already present.</p>
-<h2><a class="anchor" id="autotoc_md7"></a>
+<h3><a class="anchor" id="autotoc_md16"></a>
+Line Ending Conventions</h3>
+<p >The difference between <code>\n</code> and <code>\r\n</code> relates to different line ending conventions:</p>
+<ul>
+<li>**<code>\n</code> (Line Feed, LF)**: Used by Unix/Linux/macOS systems</li>
+<li>**<code>\r\n</code> (Carriage Return + Line Feed, CRLF)**: Used by Windows systems <br  />
+</li>
+<li>**<code>\r</code> (Carriage Return, CR)**: Used by old Mac systems (pre-macOS)</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md17"></a>
+In UART Terminal Context</h3>
+<p >When sending text over UART to a terminal:</p>
+<ol type="1">
+<li>**<code>\n</code> only**: Moves cursor to the next line but <b>may not</b> return to the beginning of the line on some terminals</li>
+<li>**<code>\r\n</code>**: Properly moves cursor to the beginning of the next line on <b>all terminals</b></li>
+</ol>
+<h3><a class="anchor" id="autotoc_md18"></a>
+Automatic Conversion Feature</h3>
+<p >If you want to use only <code>\n</code> instead of <code>\r\n</code> for printing a new line using printf(), define the macro <code>CY_RETARGET_IO_CONVERT_LF_TO_CRLF</code> using the <em>DEFINES</em> variable in the application Makefile. The library will then automatically append <code>\r</code> before each <code>\n</code> character on the output (STDOUT). No conversion occurs if <code>\r\n</code> is already present in the string.</p>
+<p ><b>Example without conversion:</b> </p><div class="fragment"><div class="line">printf(<span class="stringliteral">&quot;Line 1\n&quot;</span>);</div>
+<div class="line">printf(<span class="stringliteral">&quot;Line 2\n&quot;</span>);</div>
+<div class="line">printf(<span class="stringliteral">&quot;Line 3\n&quot;</span>);</div>
+</div><!-- fragment --><p> May display as: </p><div class="fragment"><div class="line">Line 1</div>
+<div class="line">      Line 2</div>
+<div class="line">            Line 3</div>
+</div><!-- fragment --><p ><b>Example with conversion (CY_RETARGET_IO_CONVERT_LF_TO_CRLF defined):</b> </p><div class="fragment"><div class="line">printf(<span class="stringliteral">&quot;Line 1\n&quot;</span>);  <span class="comment">// Automatically becomes &quot;Line 1\r\n&quot;</span></div>
+<div class="line">printf(<span class="stringliteral">&quot;Line 2\n&quot;</span>);  <span class="comment">// Automatically becomes &quot;Line 2\r\n&quot;</span></div>
+<div class="line">printf(<span class="stringliteral">&quot;Line 3\n&quot;</span>);  <span class="comment">// Automatically becomes &quot;Line 3\r\n&quot;</span></div>
+</div><!-- fragment --><p> Displays correctly as: </p><div class="fragment"><div class="line">Line 1</div>
+<div class="line">Line 2</div>
+<div class="line">Line 3</div>
+</div><!-- fragment --><p ><b>Recommendation:</b> For embedded UART terminals, it's generally safer to either define <code>CY_RETARGET_IO_CONVERT_LF_TO_CRLF</code> in your Makefile or manually use <code>\r\n</code> in your printf strings to ensure proper line formatting across all terminal applications.</p>
+<h2><a class="anchor" id="autotoc_md19"></a>
 Floating Point Support</h2>
-<p >By default, floating point support is enabled in printf. If floating point values will not be used in printed strings, this functionality can be disabled to reduece flash consumption. To disable floating support, add the following to the application makefile: <code>DEFINES += CY_RETARGET_IO_NO_FLOAT</code>.</p>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<p >By default, floating point support is enabled in printf. If floating point values will not be used in printed strings, this functionality can be disabled to reduce flash consumption. To disable floating support, add the following to the application makefile: <code>DEFINES += CY_RETARGET_IO_NO_FLOAT</code>.</p>
+<h2><a class="anchor" id="autotoc_md20"></a>
 More information</h2>
 <ul>
 <li><a href="https://infineon.github.io/retarget-io/html/index.html">API Reference Guide</a></li>
@@ -155,7 +298,7 @@ More information</h2>
 <li><a href="https://github.com/Infineon/modustoolbox-software">ModusToolbox™ Software</a></li>
 </ul>
 <hr  />
-<p> © Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2025. </p>
+<p> © Copyright 2018-2025 Infineon Technologies Apache2 </p>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
